@@ -1,11 +1,28 @@
 "use client"
 
-import { useEffect, useRef, useState } from 'react'
-import { Venue } from '@/types/venue'
+import { useEffect, useRef, useState } from "react"
+import { Venue } from "@/types/venue"
 
 interface GoogleMapsMapProps {
 	venues: Venue[]
 	onVenueClick: (venue: Venue) => void
+}
+
+// Google Maps types
+interface GoogleMaps {
+	maps: {
+		Map: new (element: HTMLElement, options: any) => any
+		Marker: new (options: any) => any
+		InfoWindow: new (options: any) => any
+		Size: new (width: number, height: number) => any
+		Point: new (x: number, y: number) => any
+	}
+}
+
+declare global {
+	interface Window {
+		google: GoogleMaps
+	}
 }
 
 export default function GoogleMapsMap({
@@ -22,19 +39,19 @@ export default function GoogleMapsMap({
 	useEffect(() => {
 		const fetchApiKey = async () => {
 			try {
-				const response = await fetch('/api/maps?action=load-api')
+				const response = await fetch("/api/maps?action=load-api")
 				const data = await response.json()
-				
+
 				if (data.apiKey) {
 					setApiKey(data.apiKey)
 				} else {
-					console.error('Failed to load API key:', data.error)
+					console.error("Failed to load API key:", data.error)
 				}
 			} catch (error) {
-				console.error('Error fetching API key:', error)
+				console.error("Error fetching API key:", error)
 			}
 		}
-		
+
 		fetchApiKey()
 	}, [])
 
@@ -44,12 +61,16 @@ export default function GoogleMapsMap({
 
 		const loadGoogleMaps = () => {
 			// Check if Google Maps is already loaded
-			if (window.google && window.google.maps) {
+			if (
+				typeof window !== "undefined" &&
+				window.google &&
+				window.google.maps
+			) {
 				setIsLoaded(true)
 				return
 			}
 
-			const script = document.createElement('script')
+			const script = document.createElement("script")
 			script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`
 			script.async = true
 			script.defer = true
@@ -59,7 +80,7 @@ export default function GoogleMapsMap({
 			}
 
 			script.onerror = () => {
-				console.error('Failed to load Google Maps script')
+				console.error("Failed to load Google Maps script")
 			}
 
 			document.head.appendChild(script)
@@ -70,20 +91,27 @@ export default function GoogleMapsMap({
 
 	// Initialize map once script is loaded
 	useEffect(() => {
-		if (!isLoaded || !mapRef.current || map) return
+		if (
+			!isLoaded ||
+			!mapRef.current ||
+			map ||
+			typeof window === "undefined" ||
+			!window.google
+		)
+			return
 
 		const chicagoCenter = { lat: 41.8781, lng: -87.6298 }
-		
+
 		const newMap = new window.google.maps.Map(mapRef.current, {
 			center: chicagoCenter,
 			zoom: 11,
 			styles: [
 				{
-					featureType: 'poi',
-					elementType: 'labels',
-					stylers: [{ visibility: 'off' }]
-				}
-			]
+					featureType: "poi",
+					elementType: "labels",
+					stylers: [{ visibility: "off" }],
+				},
+			],
 		})
 
 		setMap(newMap)
@@ -91,14 +119,20 @@ export default function GoogleMapsMap({
 
 	// Add markers when venues or map changes
 	useEffect(() => {
-		if (!map || !venues.length) return
+		if (
+			!map ||
+			!venues.length ||
+			typeof window === "undefined" ||
+			!window.google
+		)
+			return
 
 		// Clear existing markers
 		markers.current.forEach((marker) => marker.setMap(null))
 		const newMarkers: any[] = []
 
 		venues.forEach((venue) => {
-			const coords = venue.coordinates.split(',').map(Number)
+			const coords = venue.coordinates.split(",").map(Number)
 			if (coords.length !== 2 || isNaN(coords[0]) || isNaN(coords[1])) return
 
 			const [lat, lng] = coords
@@ -117,12 +151,12 @@ export default function GoogleMapsMap({
 						</svg>
 					`)}`,
 					scaledSize: new window.google.maps.Size(30, 30),
-					anchor: new window.google.maps.Point(15, 15)
-				}
+					anchor: new window.google.maps.Point(15, 15),
+				},
 			})
 
 			// Add click listener
-			marker.addListener('click', () => {
+			marker.addListener("click", () => {
 				onVenueClick(venue)
 			})
 
@@ -139,14 +173,14 @@ export default function GoogleMapsMap({
 								: ""
 						}
 					</div>
-				`
+				`,
 			})
 
-			marker.addListener('mouseover', () => {
+			marker.addListener("mouseover", () => {
 				infoWindow.open(map, marker)
 			})
 
-			marker.addListener('mouseout', () => {
+			marker.addListener("mouseout", () => {
 				infoWindow.close()
 			})
 
@@ -158,18 +192,18 @@ export default function GoogleMapsMap({
 
 	const getMarkerIcon = (venueType: string): string => {
 		const icons: { [key: string]: string } = {
-			restaurant: '🍽️',
-			bar: '🍺',
-			coffee: '☕',
-			theater: '🎭',
-			museum: '🏛️',
-			park: '🌳',
-			shopping: '🛍️',
-			hotel: '🏨',
-			club: '🎵',
-			gym: '💪'
+			restaurant: "🍽️",
+			bar: "🍺",
+			coffee: "☕",
+			theater: "🎭",
+			museum: "🏛️",
+			park: "🌳",
+			shopping: "🛍️",
+			hotel: "🏨",
+			club: "🎵",
+			gym: "💪",
 		}
-		return icons[venueType.toLowerCase()] || '📍'
+		return icons[venueType.toLowerCase()] || "📍"
 	}
 
 	if (!apiKey) {
