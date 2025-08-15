@@ -1,7 +1,7 @@
-'use client'
+"use client"
 
-import { Venue } from '@/types/venue'
-import { getRatingColor, getRatingBgColor } from '@/lib/utils'
+import { Venue } from "@/types/venue"
+import { getRatingColor, getRatingBgColor } from "@/lib/utils"
 
 interface VenueModalProps {
 	venue: Venue | null
@@ -9,26 +9,43 @@ interface VenueModalProps {
 	onClose: () => void
 }
 
-export default function VenueModal({ venue, isOpen, onClose }: VenueModalProps) {
+export default function VenueModal({
+	venue,
+	isOpen,
+	onClose,
+}: VenueModalProps) {
 	if (!isOpen || !venue) return null
 
 	const parseKeywords = (keywords: string) => {
 		try {
 			const parsed = JSON.parse(keywords)
-			return Array.isArray(parsed) ? parsed : []
+			if (Array.isArray(parsed)) {
+				return parsed.map((k) => k.trim()).filter((k) => k)
+			}
 		} catch {
-			return keywords.split(',').map(k => k.trim())
+			// If not JSON, split by comma and clean
+			return keywords
+				.split(",")
+				.map((k) => k.trim().replace(/[{}"]/g, ""))
+				.filter((k) => k)
 		}
+		return []
 	}
 
 	const keywords = parseKeywords(venue.keywords_tags)
 
 	const renderRating = (rating: number | null, source: string) => {
 		if (!rating) return null
-		
+
 		return (
-			<div className={`flex items-center gap-2 px-3 py-2 rounded-lg ${getRatingBgColor(rating)}`}>
-				<span className={`font-semibold ${getRatingColor(rating)}`}>⭐ {rating}</span>
+			<div
+				className={`flex items-center gap-2 px-3 py-2 rounded-lg ${getRatingBgColor(
+					rating
+				)}`}
+			>
+				<span className={`font-semibold ${getRatingColor(rating)}`}>
+					⭐ {rating}
+				</span>
 				<span className="text-sm text-gray-600">({source})</span>
 			</div>
 		)
@@ -40,7 +57,9 @@ export default function VenueModal({ venue, isOpen, onClose }: VenueModalProps) 
 				{/* Header */}
 				<div className="flex justify-between items-start p-6 border-b border-gray-200">
 					<div className="flex-1">
-						<h2 className="text-2xl font-bold text-gray-900 mb-2">{venue.name}</h2>
+						<h2 className="text-2xl font-bold text-gray-900 mb-2">
+							{venue.name}
+						</h2>
 						<div className="flex items-center gap-3 mb-2">
 							<span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
 								{venue.venue_type}
@@ -61,13 +80,17 @@ export default function VenueModal({ venue, isOpen, onClose }: VenueModalProps) 
 				{/* Content */}
 				<div className="p-6 space-y-6">
 					{/* Ratings Section */}
-					{(venue.google_maps_rating || venue.yelp_rating || venue.tripadvisor_rating) && (
+					{(venue.google_maps_rating ||
+						venue.yelp_rating ||
+						venue.tripadvisor_rating) && (
 						<div>
-							<h3 className="text-lg font-semibold text-gray-900 mb-3">Ratings</h3>
+							<h3 className="text-lg font-semibold text-gray-900 mb-3">
+								Ratings
+							</h3>
 							<div className="flex flex-wrap gap-3">
-								{renderRating(venue.google_maps_rating, 'Google Maps')}
-								{renderRating(venue.yelp_rating, 'Yelp')}
-								{renderRating(venue.tripadvisor_rating, 'TripAdvisor')}
+								{renderRating(venue.google_maps_rating, "Google Maps")}
+								{renderRating(venue.yelp_rating, "Yelp")}
+								{renderRating(venue.tripadvisor_rating, "TripAdvisor")}
 							</div>
 						</div>
 					)}
@@ -75,22 +98,33 @@ export default function VenueModal({ venue, isOpen, onClose }: VenueModalProps) 
 					{/* Description */}
 					{venue.general_description && (
 						<div>
-							<h3 className="text-lg font-semibold text-gray-900 mb-3">Description</h3>
-							<p className="text-gray-700 leading-relaxed">{venue.general_description}</p>
+							<h3 className="text-lg font-semibold text-gray-900 mb-3">
+								Description
+							</h3>
+							<p className="text-gray-700 leading-relaxed">
+								{venue.general_description}
+							</p>
 						</div>
 					)}
 
-					{venue.blog_description && venue.blog_description !== venue.general_description && (
-						<div>
-							<h3 className="text-lg font-semibold text-gray-900 mb-3">Additional Info</h3>
-							<p className="text-gray-700 leading-relaxed">{venue.blog_description}</p>
-						</div>
-					)}
+					{venue.blog_description &&
+						venue.blog_description !== venue.general_description && (
+							<div>
+								<h3 className="text-lg font-semibold text-gray-900 mb-3">
+									Additional Info
+								</h3>
+								<p className="text-gray-700 leading-relaxed">
+									{venue.blog_description}
+								</p>
+							</div>
+						)}
 
 					{/* Keywords/Tags */}
 					{keywords.length > 0 && (
 						<div>
-							<h3 className="text-lg font-semibold text-gray-900 mb-3">Keywords & Tags</h3>
+							<h3 className="text-lg font-semibold text-gray-900 mb-3">
+								Keywords & Tags
+							</h3>
 							<div className="flex flex-wrap gap-2">
 								{keywords.map((keyword, index) => (
 									<span

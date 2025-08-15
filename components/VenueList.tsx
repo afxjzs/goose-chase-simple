@@ -1,8 +1,8 @@
 "use client"
 
-import { useMemo, useState } from 'react'
-import { Venue } from '@/types/venue'
-import VenueCard from './VenueCard'
+import { useMemo, useState } from "react"
+import { Venue } from "@/types/venue"
+import VenueCard from "./VenueCard"
 
 interface VenueListProps {
 	venues: Venue[]
@@ -10,18 +10,18 @@ interface VenueListProps {
 }
 
 export default function VenueList({ venues, onVenueClick }: VenueListProps) {
-	const [searchTerm, setSearchTerm] = useState('')
-	const [selectedType, setSelectedType] = useState('')
-	const [selectedNeighborhood, setSelectedNeighborhood] = useState('')
-	const [keywordFilter, setKeywordFilter] = useState('')
+	const [searchTerm, setSearchTerm] = useState("")
+	const [selectedType, setSelectedType] = useState("")
+	const [selectedNeighborhood, setSelectedNeighborhood] = useState("")
+	const [keywordFilter, setKeywordFilter] = useState("")
 
 	// Get unique venue types (handle slash-separated types)
 	const venueTypes = useMemo(() => {
 		const types = new Set<string>()
-		venues.forEach(venue => {
+		venues.forEach((venue) => {
 			// Split by slash and add each part
-			const typeParts = venue.venue_type.split('/').map(t => t.trim())
-			typeParts.forEach(part => {
+			const typeParts = venue.venue_type.split("/").map((t) => t.trim())
+			typeParts.forEach((part) => {
 				if (part) types.add(part)
 			})
 		})
@@ -31,24 +31,47 @@ export default function VenueList({ venues, onVenueClick }: VenueListProps) {
 	// Get unique neighborhoods
 	const neighborhoods = useMemo(() => {
 		const hoods = new Set<string>()
-		venues.forEach(venue => {
+		venues.forEach((venue) => {
 			if (venue.neighborhood) hoods.add(venue.neighborhood)
 		})
 		return Array.from(hoods).sort()
 	}, [venues])
 
+	// Parse and clean keywords for filtering
+	const getCleanKeywords = (keywords: string) => {
+		if (!keywords) return []
+
+		try {
+			const parsed = JSON.parse(keywords)
+			if (Array.isArray(parsed)) {
+				return parsed.map((k) => k.trim().toLowerCase()).filter((k) => k)
+			}
+		} catch {
+			// If not JSON, split by comma and clean
+			return keywords
+				.split(",")
+				.map((k) => k.trim().replace(/[{}"]/g, "").toLowerCase())
+				.filter((k) => k)
+		}
+
+		return []
+	}
+
 	// Filter venues based on all criteria
 	const filteredVenues = useMemo(() => {
-		return venues.filter(venue => {
+		return venues.filter((venue) => {
 			// Search term filter
-			if (searchTerm && !venue.name.toLowerCase().includes(searchTerm.toLowerCase())) {
+			if (
+				searchTerm &&
+				!venue.name.toLowerCase().includes(searchTerm.toLowerCase())
+			) {
 				return false
 			}
 
 			// Type filter (handle slash-separated types)
 			if (selectedType) {
-				const typeParts = venue.venue_type.split('/').map(t => t.trim())
-				if (!typeParts.some(part => part === selectedType)) {
+				const typeParts = venue.venue_type.split("/").map((t) => t.trim())
+				if (!typeParts.some((part) => part === selectedType)) {
 					return false
 				}
 			}
@@ -60,8 +83,12 @@ export default function VenueList({ venues, onVenueClick }: VenueListProps) {
 
 			// Keyword filter
 			if (keywordFilter && venue.keywords_tags) {
-				const keywords = venue.keywords_tags.toLowerCase()
-				if (!keywords.includes(keywordFilter.toLowerCase())) {
+				const cleanKeywords = getCleanKeywords(venue.keywords_tags)
+				if (
+					!cleanKeywords.some((keyword) =>
+						keyword.includes(keywordFilter.toLowerCase())
+					)
+				) {
 					return false
 				}
 			}
@@ -71,10 +98,10 @@ export default function VenueList({ venues, onVenueClick }: VenueListProps) {
 	}, [venues, searchTerm, selectedType, selectedNeighborhood, keywordFilter])
 
 	const clearFilters = () => {
-		setSearchTerm('')
-		setSelectedType('')
-		setSelectedNeighborhood('')
-		setKeywordFilter('')
+		setSearchTerm("")
+		setSelectedType("")
+		setSelectedNeighborhood("")
+		setKeywordFilter("")
 	}
 
 	return (
@@ -98,8 +125,10 @@ export default function VenueList({ venues, onVenueClick }: VenueListProps) {
 						className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
 					>
 						<option value="">All Types</option>
-						{venueTypes.map(type => (
-							<option key={type} value={type}>{type}</option>
+						{venueTypes.map((type) => (
+							<option key={type} value={type}>
+								{type}
+							</option>
 						))}
 					</select>
 
@@ -110,8 +139,10 @@ export default function VenueList({ venues, onVenueClick }: VenueListProps) {
 						className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
 					>
 						<option value="">All Neighborhoods</option>
-						{neighborhoods.map(hood => (
-							<option key={hood} value={hood}>{hood}</option>
+						{neighborhoods.map((hood) => (
+							<option key={hood} value={hood}>
+								{hood}
+							</option>
 						))}
 					</select>
 
@@ -130,7 +161,10 @@ export default function VenueList({ venues, onVenueClick }: VenueListProps) {
 					<div className="text-sm text-gray-600">
 						Showing {filteredVenues.length} of {venues.length} venues
 					</div>
-					{(searchTerm || selectedType || selectedNeighborhood || keywordFilter) && (
+					{(searchTerm ||
+						selectedType ||
+						selectedNeighborhood ||
+						keywordFilter) && (
 						<button
 							onClick={clearFilters}
 							className="text-sm text-blue-600 hover:text-blue-800 underline"
