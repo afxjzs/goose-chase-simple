@@ -19,12 +19,6 @@ interface GoogleMaps {
 	}
 }
 
-declare global {
-	interface Window {
-		google: GoogleMaps
-	}
-}
-
 export default function GoogleMapsMap({
 	venues,
 	onVenueClick,
