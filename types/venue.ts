@@ -17,6 +17,10 @@ export interface Venue {
 	google_maps_reviews_count: number | null
 	tripadvisor_reviews_count: number | null
 	processed_at: string
+	// Photo-related fields
+	gmaps_place_id?: string
+	gmaps_primary_photo_ref?: string
+	gmaps_photo_attribution?: string
 }
 
 export interface VenueModalProps {

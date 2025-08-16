@@ -126,9 +126,20 @@ export default function Home() {
 			{/* Header */}
 			<header className="bg-white shadow-sm border-b">
 				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-					<h1 className="text-3xl font-bold text-gray-900">
-						Dante's Chicago Venues Map
-					</h1>
+					<h1 className="text-3xl font-bold text-gray-900">Goose Chase</h1>
+				</div>
+			</header>
+
+			{/* Main Content */}
+			<main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+				{/* Map Section */}
+				<section className="mb-12">
+					<GoogleMapsMap venues={venues} onVenueClick={handleVenueClick} />
+				</section>
+
+				{/* Venue List Section */}
+				<section>
+					<VenueList venues={venues} onVenueClick={handleVenueClick} />
 					<p className="text-gray-600 mt-2">
 						Explore {venues.length} Chicago venues from{" "}
 						<a
@@ -150,25 +161,6 @@ export default function Home() {
 							@glowingrec
 						</a>
 					</p>
-				</div>
-			</header>
-
-			{/* Main Content */}
-			<main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-				{/* Map Section */}
-				<section className="mb-12">
-					<h2 className="text-2xl font-semibold text-gray-900 mb-6">
-						Interactive Map
-					</h2>
-					<GoogleMapsMap venues={venues} onVenueClick={handleVenueClick} />
-				</section>
-
-				{/* Venue List Section */}
-				<section>
-					<h2 className="text-2xl font-semibold text-gray-900 mb-6">
-						All Venues
-					</h2>
-					<VenueList venues={venues} onVenueClick={handleVenueClick} />
 				</section>
 			</main>
 

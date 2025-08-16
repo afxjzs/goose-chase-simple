@@ -154,20 +154,41 @@ export default function GoogleMapsMap({
 				onVenueClick(venue)
 			})
 
-			// Add hover info window
-			const infoWindow = new window.google.maps.InfoWindow({
-				content: `
-					<div class="p-2">
-						<h3 class="font-semibold text-sm">${venue.name}</h3>
-						<p class="text-sm text-gray-600">${venue.venue_type}</p>
-						<p class="text-sm">${venue.neighborhood}</p>
+			// Create enhanced info window content with photo
+			const infoWindowContent = `
+				<div class="p-3 max-w-xs">
+					<div class="flex items-start gap-3">
 						${
-							venue.google_maps_rating
-								? `<p class="text-sm">⭐ ${venue.google_maps_rating}</p>`
+							venue.gmaps_primary_photo_ref
+								? `<div class="flex-shrink-0">
+										<img src="/api/photo?ref=${encodeURIComponent(
+											venue.gmaps_primary_photo_ref
+										)}&w=80&h=60" 
+											 alt="${venue.name}" 
+											 class="w-20 h-15 object-cover rounded" />
+									</div>`
 								: ""
 						}
+						<div class="flex-1 min-w-0">
+							<h3 class="font-semibold text-sm text-gray-900 truncate">${venue.name}</h3>
+							<p class="text-sm text-blue-600 font-medium">${venue.venue_type}</p>
+							<p class="text-sm text-gray-600">${venue.neighborhood}</p>
+							${
+								venue.google_maps_rating
+									? `<p class="text-sm text-amber-600">⭐ ${venue.google_maps_rating}</p>`
+									: ""
+							}
+							<button class="mt-2 text-xs bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700 transition-colors">
+								View Details
+							</button>
+						</div>
 					</div>
-				`,
+				</div>
+			`
+
+			// Add hover info window
+			const infoWindow = new window.google.maps.InfoWindow({
+				content: infoWindowContent,
 			})
 
 			marker.addListener("mouseover", () => {
