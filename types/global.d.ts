@@ -6,6 +6,16 @@ interface GoogleMaps {
 		InfoWindow: new (options: any) => any
 		Size: new (width: number, height: number) => any
 		Point: new (x: number, y: number) => any
+		ControlPosition: {
+			TOP_LEFT: any
+			TOP_RIGHT: any
+			BOTTOM_LEFT: any
+			BOTTOM_RIGHT: any
+		}
+		MapTypeControlStyle: {
+			HORIZONTAL_BAR: any
+			DROPDOWN_MENU: any
+		}
 	}
 }
 

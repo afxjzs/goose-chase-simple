@@ -14,6 +14,11 @@ export default function Home() {
 	const [selectedVenue, setSelectedVenue] = useState<Venue | null>(null)
 	const [isModalOpen, setIsModalOpen] = useState(false)
 
+	// Set the page title dynamically
+	useEffect(() => {
+		document.title = "Goose Chase | Chicago Venues"
+	}, [])
+
 	useEffect(() => {
 		console.log("Home component mounted, starting to load venues...")
 		loadVenues()
@@ -127,6 +132,10 @@ export default function Home() {
 			<header className="bg-white shadow-sm border-b">
 				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
 					<h1 className="text-3xl font-bold text-gray-900">Goose Chase</h1>
+					<p className="text-gray-600 mt-2">
+						Chicago has a million places to eat and drink. These are the best
+						ones.
+					</p>
 				</div>
 			</header>
 
@@ -143,13 +152,21 @@ export default function Home() {
 					<p className="text-gray-600 mt-2">
 						Explore {venues.length} Chicago venues from{" "}
 						<a
+							href="https://twitter.com/dantethedon"
+							target="_blank"
+							rel="noopener noreferrer"
+							className="text-blue-600 hover:underline"
+						>
+							@DanteTheDon
+						</a>
+						{"'s "}
+						<a
 							href="https://www.barstoolsports.com/blog/3548304/chicago-is-an-elite-bachelor-party-destination-in-america-and-here-is-your-definitive-guide"
 							target="_blank"
 							rel="noopener noreferrer"
 							className="text-blue-600 hover:underline"
 						>
-							Dante's Barstool Sports article on Chicago bachelor party
-							destinations
+							Barstool Sports article on Chicago bachelor party destinations
 						</a>
 						. Built by{" "}
 						<a

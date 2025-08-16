@@ -76,10 +76,10 @@ export default function VenueHeroPhoto({
 									photoRef
 								)
 
-								// Use our server-side photo endpoint
+								// Use our server-side photo endpoint with consistent size
 								const photoUrl = `/api/google-places-photo?photoRef=${encodeURIComponent(
 									photoRef
-								)}&maxWidth=1200`
+								)}&maxWidth=300&maxHeight=200`
 								setPhotoUrl(photoUrl)
 								return
 							}
@@ -102,7 +102,7 @@ export default function VenueHeroPhoto({
 	if (imageLoading && !photoUrl) {
 		return (
 			<div
-				className={`relative aspect-[16/9] w-full overflow-hidden rounded-2xl bg-gray-200 flex items-center justify-center ${className}`}
+				className={`relative aspect-[3/2] w-full overflow-hidden rounded-lg bg-gray-200 flex items-center justify-center ${className}`}
 			>
 				<div className="text-gray-400 text-center">
 					<div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
@@ -116,7 +116,7 @@ export default function VenueHeroPhoto({
 	if (photoError || !photoUrl) {
 		return (
 			<div
-				className={`relative aspect-[16/9] w-full overflow-hidden rounded-2xl bg-gray-200 flex items-center justify-center ${className}`}
+				className={`relative aspect-[3/2] w-full overflow-hidden rounded-lg bg-gray-200 flex items-center justify-center ${className}`}
 			>
 				<div className="text-gray-400 text-center">
 					<div className="text-4xl mb-2">📷</div>
@@ -129,13 +129,13 @@ export default function VenueHeroPhoto({
 	// Show the real photo
 	return (
 		<div
-			className={`relative aspect-[16/9] w-full overflow-hidden rounded-2xl ${className}`}
+			className={`relative aspect-[3/2] w-full overflow-hidden rounded-lg ${className}`}
 		>
 			<Image
 				src={photoUrl}
 				alt={`${venueName} - ${venueType}`}
 				fill
-				sizes="(max-width: 768px) 100vw, 1200px"
+				sizes="(max-width: 768px) 100vw, 300px"
 				priority={false}
 				className="object-cover"
 				onLoad={() => setImageLoading(false)}

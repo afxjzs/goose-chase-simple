@@ -99,6 +99,18 @@ export default function GoogleMapsMap({
 		const newMap = new window.google.maps.Map(mapRef.current, {
 			center: chicagoCenter,
 			zoom: 11,
+			zoomControl: true,
+			zoomControlOptions: {
+				position: window.google.maps.ControlPosition.TOP_LEFT,
+			},
+			mapTypeControl: true,
+			mapTypeControlOptions: {
+				style: window.google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
+				position: window.google.maps.ControlPosition.TOP_RIGHT,
+			},
+			streetViewControl: true,
+			fullscreenControl: true,
+			scaleControl: true,
 			styles: [
 				{
 					featureType: "poi",

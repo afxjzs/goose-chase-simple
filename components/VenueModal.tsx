@@ -65,7 +65,7 @@ export default function VenueModal({
 			className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
 			onClick={handleBackdropClick}
 		>
-			<div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+			<div className="bg-white rounded-lg max-w-6xl w-full max-h-[90vh] overflow-y-auto">
 				{/* Header */}
 				<div className="flex justify-between items-start p-6 border-b border-gray-200">
 					<div className="flex-1">
@@ -89,135 +89,147 @@ export default function VenueModal({
 					</button>
 				</div>
 
-				{/* Hero Photo */}
-				<div className="p-6 pb-4">
-					<VenueHeroPhoto
-						venueName={venue.name}
-						venueType={venue.venue_type}
-						neighborhood={venue.neighborhood}
-						cachedPhotoRef={venue.gmaps_primary_photo_ref}
-					/>
-					<PhotoAttribution
-						html={
-							venue.gmaps_photo_attribution || "Photo from Google Places API"
-						}
-					/>
-				</div>
-
-				{/* Content */}
-				<div className="p-6 space-y-6">
-					{/* Ratings Section */}
-					{(venue.google_maps_rating ||
-						venue.yelp_rating ||
-						venue.tripadvisor_rating) && (
-						<div>
-							<h3 className="text-lg font-semibold text-gray-900 mb-3">
-								Ratings
-							</h3>
-							<div className="flex flex-wrap gap-3">
-								{renderRating(venue.google_maps_rating, "Google Maps")}
-								{renderRating(venue.yelp_rating, "Yelp")}
-								{renderRating(venue.tripadvisor_rating, "TripAdvisor")}
-							</div>
+				{/* Content Layout - Side by Side */}
+				<div className="flex flex-col lg:flex-row">
+					{/* Left Side - Photo and Basic Info */}
+					<div className="lg:w-1/3 p-6 border-r border-gray-200">
+						{/* Hero Photo */}
+						<div className="mb-6">
+							<VenueHeroPhoto
+								venueName={venue.name}
+								venueType={venue.venue_type}
+								neighborhood={venue.neighborhood}
+								cachedPhotoRef={venue.gmaps_primary_photo_ref}
+							/>
+							<PhotoAttribution
+								html={
+									venue.gmaps_photo_attribution ||
+									"Photo from Google Places API"
+								}
+							/>
 						</div>
-					)}
 
-					{/* Description Section */}
-					{(venue.blog_description || venue.general_description) && (
-						<div>
-							<h3 className="text-lg font-semibold text-gray-900 mb-3">
-								Description
-							</h3>
-							<div className="space-y-3">
-								{venue.blog_description && (
-									<div>
-										<h4 className="font-medium text-gray-800 mb-2">
-											Blog Description
-										</h4>
-										<p className="text-gray-700 leading-relaxed">
-											{venue.blog_description}
-										</p>
+						{/* Quick Info */}
+						<div className="space-y-4">
+							{/* Ratings Section */}
+							{(venue.google_maps_rating ||
+								venue.yelp_rating ||
+								venue.tripadvisor_rating) && (
+								<div>
+									<h3 className="text-lg font-semibold text-gray-900 mb-3">
+										Ratings
+									</h3>
+									<div className="space-y-2">
+										{renderRating(venue.google_maps_rating, "Google Maps")}
+										{renderRating(venue.yelp_rating, "Yelp")}
+										{renderRating(venue.tripadvisor_rating, "TripAdvisor")}
 									</div>
-								)}
-								{venue.general_description && (
-									<div>
-										<h4 className="font-medium text-gray-800 mb-2">
-											General Description
-										</h4>
-										<p className="text-gray-700 leading-relaxed">
-											{venue.general_description}
-										</p>
+								</div>
+							)}
+
+							{/* Links Section */}
+							{(venue.google_maps_url ||
+								venue.yelp_url ||
+								venue.tripadvisor_url) && (
+								<div>
+									<h3 className="text-lg font-semibold text-gray-900 mb-3">
+										Links
+									</h3>
+									<div className="space-y-2">
+										{venue.google_maps_url && (
+											<a
+												href={venue.google_maps_url}
+												target="_blank"
+												rel="noopener noreferrer"
+												className="flex items-center gap-2 px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
+											>
+												📍 Google Maps
+											</a>
+										)}
+										{venue.yelp_url && (
+											<a
+												href={venue.yelp_url}
+												target="_blank"
+												rel="noopener noreferrer"
+												className="flex items-center gap-2 px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
+											>
+												⭐ Yelp
+											</a>
+										)}
+										{venue.tripadvisor_url && (
+											<a
+												href={venue.tripadvisor_url}
+												target="_blank"
+												rel="noopener noreferrer"
+												className="flex items-center gap-2 px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
+											>
+												🌍 TripAdvisor
+											</a>
+										)}
 									</div>
-								)}
+								</div>
+							)}
+						</div>
+					</div>
+
+					{/* Right Side - Main Content */}
+					<div className="lg:w-2/3 p-6">
+						<div className="space-y-6">
+							{/* Description Section */}
+							{(venue.blog_description || venue.general_description) && (
+								<div>
+									<h3 className="text-lg font-semibold text-gray-900 mb-3">
+										Description
+									</h3>
+									<div className="space-y-3">
+										{venue.blog_description && (
+											<div>
+												<h4 className="font-medium text-gray-800 mb-2">
+													Blog Description
+												</h4>
+												<p className="text-gray-700 leading-relaxed">
+													{venue.blog_description}
+												</p>
+											</div>
+										)}
+										{venue.general_description && (
+											<div>
+												<h4 className="font-medium text-gray-800 mb-2">
+													General Description
+												</h4>
+												<p className="text-gray-700 leading-relaxed">
+													{venue.general_description}
+												</p>
+											</div>
+										)}
+									</div>
+								</div>
+							)}
+
+							{/* Keywords Section */}
+							{keywords.length > 0 && (
+								<div>
+									<h3 className="text-lg font-semibold text-gray-900 mb-3">
+										Keywords & Tags
+									</h3>
+									<div className="flex flex-wrap gap-2">
+										{keywords.map((keyword, index) => (
+											<span
+												key={index}
+												className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm"
+											>
+												{keyword}
+											</span>
+										))}
+									</div>
+								</div>
+							)}
+
+							{/* Additional Info */}
+							<div className="text-sm text-gray-500 pt-4 border-t border-gray-200">
+								<p>Last updated: {venue.processed_at}</p>
 							</div>
 						</div>
-					)}
-
-					{/* Keywords Section */}
-					{keywords.length > 0 && (
-						<div>
-							<h3 className="text-lg font-semibold text-gray-900 mb-3">
-								Keywords & Tags
-							</h3>
-							<div className="flex flex-wrap gap-2">
-								{keywords.map((keyword, index) => (
-									<span
-										key={index}
-										className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm"
-									>
-										{keyword}
-									</span>
-								))}
-							</div>
-						</div>
-					)}
-
-					{/* Links Section */}
-					{(venue.google_maps_url ||
-						venue.yelp_url ||
-						venue.tripadvisor_url) && (
-						<div>
-							<h3 className="text-lg font-semibold text-gray-900 mb-3">
-								Links
-							</h3>
-							<div className="flex flex-wrap gap-3">
-								{venue.google_maps_url && (
-									<a
-										href={venue.google_maps_url}
-										target="_blank"
-										rel="noopener noreferrer"
-										className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-									>
-										📍 Google Maps
-									</a>
-								)}
-								{venue.yelp_url && (
-									<a
-										href={venue.yelp_url}
-										target="_blank"
-										rel="noopener noreferrer"
-										className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-									>
-										⭐ Yelp
-									</a>
-								)}
-								{venue.tripadvisor_url && (
-									<a
-										href={venue.tripadvisor_url}
-										target="_blank"
-										rel="noopener noreferrer"
-										className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-									>
-										🌍 TripAdvisor
-									</a>
-								)}
-							</div>
-						</div>
-					)}
-
-					{/* Additional Info */}
-					<div className="text-sm text-gray-500 pt-4 border-t border-gray-200">
-						<p>Last updated: {venue.processed_at}</p>
 					</div>
 				</div>
 			</div>

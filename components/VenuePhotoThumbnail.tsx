@@ -1,13 +1,13 @@
 "use client"
-import Image from 'next/image'
-import { useState, useEffect } from 'react'
+import Image from "next/image"
+import { useState, useEffect } from "react"
 
 interface VenuePhotoThumbnailProps {
 	venueName: string
 	venueType: string
 	neighborhood?: string
 	className?: string
-	size?: 'sm' | 'md' | 'lg'
+	size?: "sm" | "md" | "lg"
 }
 
 export default function VenuePhotoThumbnail({
@@ -15,16 +15,16 @@ export default function VenuePhotoThumbnail({
 	venueType,
 	neighborhood,
 	className = "",
-	size = 'md'
+	size = "lg",
 }: VenuePhotoThumbnailProps) {
 	const [photoUrl, setPhotoUrl] = useState<string | null>(null)
 	const [imageLoading, setImageLoading] = useState(true)
 	const [photoError, setPhotoError] = useState(false)
 
 	const sizeConfig = {
-		sm: { width: 120, height: 90, className: 'aspect-[4/3]' },
-		md: { width: 200, height: 150, className: 'aspect-[4/3]' },
-		lg: { width: 300, height: 200, className: 'aspect-[3/2]' }
+		sm: { width: 120, height: 80, className: "aspect-[3/2]" },
+		md: { width: 250, height: 167, className: "aspect-[3/2]" },
+		lg: { width: 300, height: 200, className: "aspect-[3/2]" },
 	}
 
 	const config = sizeConfig[size]
@@ -33,29 +33,35 @@ export default function VenuePhotoThumbnail({
 		const fetchPhoto = async () => {
 			try {
 				// Search for the venue using Google Places API
-				const searchQuery = `${venueName} ${neighborhood || ''} Chicago`
-				const searchResponse = await fetch(`/api/google-places-search?query=${encodeURIComponent(searchQuery)}`)
-				
+				const searchQuery = `${venueName} ${neighborhood || ""} Chicago`
+				const searchResponse = await fetch(
+					`/api/google-places-search?query=${encodeURIComponent(searchQuery)}`
+				)
+
 				if (searchResponse.ok) {
 					const searchData = await searchResponse.json()
 					if (searchData.results && searchData.results.length > 0) {
 						const place = searchData.results[0]
-						
+
 						// Get photos for this place
-						const photosResponse = await fetch(`/api/google-places-photos?placeId=${place.place_id}`)
+						const photosResponse = await fetch(
+							`/api/google-places-photos?placeId=${place.place_id}`
+						)
 						if (photosResponse.ok) {
 							const photosData = await photosResponse.json()
 							if (photosData.photos && photosData.photos.length > 0) {
 								const photoRef = photosData.photos[0].photo_reference
 								// Use our server-side photo endpoint
-								const photoUrl = `/api/google-places-photo?photoRef=${encodeURIComponent(photoRef)}&maxWidth=${config.width}&maxHeight=${config.height}`
+								const photoUrl = `/api/google-places-photo?photoRef=${encodeURIComponent(
+									photoRef
+								)}&maxWidth=${config.width}&maxHeight=${config.height}`
 								setPhotoUrl(photoUrl)
 								return
 							}
 						}
 					}
 				}
-				
+
 				// If we get here, no photo was found
 				setPhotoError(true)
 			} catch (error) {
@@ -70,7 +76,9 @@ export default function VenuePhotoThumbnail({
 	// Show loading state
 	if (imageLoading && !photoUrl) {
 		return (
-			<div className={`relative overflow-hidden rounded-lg bg-gray-200 flex items-center justify-center ${config.className} ${className}`}>
+			<div
+				className={`relative overflow-hidden rounded-lg bg-gray-200 flex items-center justify-center ${config.className} ${className}`}
+			>
 				<div className="text-gray-400 text-center">
 					<div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mx-auto mb-1"></div>
 					<div className="text-xs">Loading...</div>
@@ -82,18 +90,22 @@ export default function VenuePhotoThumbnail({
 	// Show error state
 	if (photoError || !photoUrl) {
 		return (
-			<div className={`relative overflow-hidden rounded-lg bg-gray-200 flex items-center justify-center ${config.className} ${className}`}>
+			<div
+				className={`relative overflow-hidden rounded-lg bg-gray-200 flex items-center justify-center ${config.className} ${className}`}
+			>
 				<div className="text-gray-400 text-center">
 					<div className="text-2xl mb-1">📷</div>
 					<div className="text-xs">No photo</div>
 				</div>
 			</div>
-			)
+		)
 	}
 
 	// Show the real photo
 	return (
-		<div className={`relative overflow-hidden rounded-lg ${config.className} ${className}`}>
+		<div
+			className={`relative overflow-hidden rounded-lg ${config.className} ${className}`}
+		>
 			<Image
 				src={photoUrl}
 				alt={`${venueName} - ${venueType}`}

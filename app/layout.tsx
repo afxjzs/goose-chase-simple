@@ -5,7 +5,7 @@ import "./globals.css"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-	title: "Dante's Chicago Venues Map",
+	title: "Goose Chase | Chicago Venues",
 	description: "Interactive map of Chicago venues and restaurants",
 }
 

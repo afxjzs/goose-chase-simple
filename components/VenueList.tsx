@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useMemo, useState, useRef, useEffect } from "react"
 import { Venue } from "@/types/venue"
 import VenueCard from "./VenueCard"
 
@@ -14,6 +14,10 @@ export default function VenueList({ venues, onVenueClick }: VenueListProps) {
 	const [selectedType, setSelectedType] = useState("")
 	const [selectedNeighborhood, setSelectedNeighborhood] = useState("")
 	const [keywordFilter, setKeywordFilter] = useState("")
+	const [showKeywordSuggestions, setShowKeywordSuggestions] = useState(false)
+	const [keywordSuggestions, setKeywordSuggestions] = useState<string[]>([])
+	const keywordInputRef = useRef<HTMLInputElement>(null)
+	const suggestionsRef = useRef<HTMLDivElement>(null)
 
 	// Get unique venue types (handle slash-separated types)
 	const venueTypes = useMemo(() => {
@@ -56,6 +60,60 @@ export default function VenueList({ venues, onVenueClick }: VenueListProps) {
 
 		return []
 	}
+
+	// Get all unique keywords for autocomplete
+	const allKeywords = useMemo(() => {
+		const keywords = new Set<string>()
+		venues.forEach((venue) => {
+			if (venue.keywords_tags) {
+				const cleanKeywords = getCleanKeywords(venue.keywords_tags)
+				cleanKeywords.forEach((keyword) => keywords.add(keyword))
+			}
+		})
+		return Array.from(keywords).sort()
+	}, [venues])
+
+	// Handle keyword input changes and show suggestions
+	const handleKeywordInputChange = (value: string) => {
+		setKeywordFilter(value)
+
+		if (value.trim()) {
+			const filtered = allKeywords.filter((keyword) =>
+				keyword.toLowerCase().includes(value.toLowerCase())
+			)
+			setKeywordSuggestions(filtered)
+			setShowKeywordSuggestions(filtered.length > 0)
+		} else {
+			setShowKeywordSuggestions(false)
+			setKeywordSuggestions([])
+		}
+	}
+
+	// Handle keyword suggestion selection
+	const handleKeywordSuggestionClick = (suggestion: string) => {
+		setKeywordFilter(suggestion)
+		setShowKeywordSuggestions(false)
+		keywordInputRef.current?.focus()
+	}
+
+	// Close suggestions when clicking outside
+	useEffect(() => {
+		const handleClickOutside = (event: MouseEvent) => {
+			if (
+				suggestionsRef.current &&
+				!suggestionsRef.current.contains(event.target as Node) &&
+				keywordInputRef.current &&
+				!keywordInputRef.current.contains(event.target as Node)
+			) {
+				setShowKeywordSuggestions(false)
+			}
+		}
+
+		document.addEventListener("mousedown", handleClickOutside)
+		return () => {
+			document.removeEventListener("mousedown", handleClickOutside)
+		}
+	}, [])
 
 	// Filter venues based on all criteria
 	const filteredVenues = useMemo(() => {
@@ -102,6 +160,8 @@ export default function VenueList({ venues, onVenueClick }: VenueListProps) {
 		setSelectedType("")
 		setSelectedNeighborhood("")
 		setKeywordFilter("")
+		setShowKeywordSuggestions(false)
+		setKeywordSuggestions([])
 	}
 
 	return (
@@ -146,14 +206,44 @@ export default function VenueList({ venues, onVenueClick }: VenueListProps) {
 						))}
 					</select>
 
-					{/* Keyword Filter */}
-					<input
-						type="text"
-						placeholder="Filter by keywords..."
-						value={keywordFilter}
-						onChange={(e) => setKeywordFilter(e.target.value)}
-						className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-					/>
+					{/* Keyword Filter with Autocomplete */}
+					<div className="relative">
+						<input
+							ref={keywordInputRef}
+							type="text"
+							placeholder="Filter by keywords..."
+							value={keywordFilter}
+							onChange={(e) => handleKeywordInputChange(e.target.value)}
+							onFocus={() => {
+								if (keywordFilter.trim()) {
+									const filtered = allKeywords.filter((keyword) =>
+										keyword.toLowerCase().includes(keywordFilter.toLowerCase())
+									)
+									setKeywordSuggestions(filtered)
+									setShowKeywordSuggestions(filtered.length > 0)
+								}
+							}}
+							className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+						/>
+
+						{/* Autocomplete Suggestions */}
+						{showKeywordSuggestions && (
+							<div
+								ref={suggestionsRef}
+								className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-48 overflow-y-auto"
+							>
+								{keywordSuggestions.map((suggestion, index) => (
+									<div
+										key={index}
+										onClick={() => handleKeywordSuggestionClick(suggestion)}
+										className="px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm border-b border-gray-100 last:border-b-0"
+									>
+										{suggestion}
+									</div>
+								))}
+							</div>
+						)}
+					</div>
 				</div>
 
 				{/* Results and Clear */}
