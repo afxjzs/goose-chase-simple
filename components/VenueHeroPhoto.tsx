@@ -31,7 +31,7 @@ export default function VenueHeroPhoto({
 
 	// Memoize the fetch function to prevent recreation on every render
 	const fetchPhoto = useCallback(async () => {
-		// If we have cached photo data from props, use it immediately
+		// If we have a cached photo reference from CSV, use it directly
 		if (cachedPhotoRef) {
 			const photoUrl = `/api/google-places-photo?photoRef=${encodeURIComponent(
 				cachedPhotoRef
@@ -40,26 +40,17 @@ export default function VenueHeroPhoto({
 			return
 		}
 
-		// Check photo cache first
 		const photoCache = PhotoCache.getInstance()
 		if (photoCache.hasCachedPhoto(venueName, neighborhood || "")) {
 			const cached = photoCache.getCachedPhoto(venueName, neighborhood || "")
 			if (cached) {
-				// Adjust the cached URL to match our size requirements
-				const adjustedUrl = cached.photo_url.replace(
-					/maxWidth=\d+&maxHeight=\d+/,
-					`maxWidth=300&maxHeight=200`
-				)
-				setPhotoUrl(adjustedUrl)
+				setPhotoUrl(cached.photo_url) // Use cached URL directly
 				return
 			}
 		}
 
-		// No cache - fetch from Google Places API
 		try {
 			console.log(`Fetching photo for ${venueName}...`)
-
-			// Search for the venue using Google Places API
 			const searchQuery = `${venueName} ${neighborhood || ""} Chicago`
 			const searchResponse = await fetch(
 				`/api/google-places-search?query=${encodeURIComponent(searchQuery)}`
@@ -69,8 +60,6 @@ export default function VenueHeroPhoto({
 				const searchData = await searchResponse.json()
 				if (searchData.results && searchData.results.length > 0) {
 					const place = searchData.results[0]
-
-					// Get photos for this place
 					const photosResponse = await fetch(
 						`/api/google-places-photos?placeId=${place.place_id}`
 					)
@@ -79,7 +68,6 @@ export default function VenueHeroPhoto({
 						if (photosData.photos && photosData.photos.length > 0) {
 							const photoRef = photosData.photos[0].photo_reference
 
-							// Cache this photo for future use
 							photoCache.cachePhoto(
 								venueName,
 								neighborhood || "",
@@ -87,18 +75,18 @@ export default function VenueHeroPhoto({
 								photoRef
 							)
 
-							// Use our server-side photo endpoint with consistent size
-							const photoUrl = `/api/google-places-photo?photoRef=${encodeURIComponent(
-								photoRef
-							)}&maxWidth=300&maxHeight=200`
-							setPhotoUrl(photoUrl)
-							return
+							const cached = photoCache.getCachedPhoto(
+								venueName,
+								neighborhood || ""
+							)
+							if (cached) {
+								setPhotoUrl(cached.photo_url) // Use cached URL for perfect caching
+								return
+							}
 						}
 					}
 				}
 			}
-
-			// If we get here, no photo was found
 			setPhotoError(true)
 		} catch (error) {
 			console.warn(`Could not get photo for ${venueName}:`, error)

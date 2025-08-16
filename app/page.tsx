@@ -118,7 +118,7 @@ export default function Home() {
 							<p className="font-sans text-sm text-gray-600">
 								© 2025 Goose Chase | Built by{" "}
 								<a
-									href="https://doug.is"
+									href="https://doug.is/utm_source=goosechase"
 									target="_blank"
 									rel="noopener noreferrer"
 									className="text-primary hover:text-primary-dark transition-colors underline"

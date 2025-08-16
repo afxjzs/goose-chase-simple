@@ -18,9 +18,11 @@ export interface PhotoCacheEntry {
 
 export class PhotoCache {
 	private static instance: PhotoCache
-	private cache: Map<string, PhotoCacheEntry> = new Map()
+	private cache: Map<string, PhotoCacheEntry>
 
-	private constructor() {}
+	private constructor() {
+		this.cache = new Map()
+	}
 
 	static getInstance(): PhotoCache {
 		if (!PhotoCache.instance) {
@@ -29,20 +31,13 @@ export class PhotoCache {
 		return PhotoCache.instance
 	}
 
-	// Generate a cache key from venue name and address
-	private getCacheKey(venueName: string, venueAddress: string): string {
-		return `${venueName.toLowerCase().trim()}|${venueAddress
-			.toLowerCase()
-			.trim()}`
-	}
-
-	// Check if we have a cached photo for this venue
+	// Check if a photo is cached
 	hasCachedPhoto(venueName: string, venueAddress: string): boolean {
 		const key = this.getCacheKey(venueName, venueAddress)
 		return this.cache.has(key)
 	}
 
-	// Get cached photo data
+	// Get a cached photo
 	getCachedPhoto(
 		venueName: string,
 		venueAddress: string
@@ -66,51 +61,29 @@ export class PhotoCache {
 			photo_reference: photoRef,
 			photo_url: `/api/google-places-photo?photoRef=${encodeURIComponent(
 				photoRef
-			)}&maxWidth=1200`,
+			)}&maxWidth=300&maxHeight=200`, // ALWAYS use 300x200 for consistency
 			last_updated: new Date().toISOString(),
 		}
 		this.cache.set(key, entry)
 	}
 
-	// Load cache from CSV data
-	loadFromVenues(venues: Venue[]): void {
-		venues.forEach((venue) => {
-			if (venue.gmaps_place_id && venue.gmaps_primary_photo_ref) {
-				this.cachePhoto(
-					venue.name,
-					venue.address,
-					venue.gmaps_place_id,
-					venue.gmaps_primary_photo_ref
-				)
-			}
-		})
-	}
-
-	// Get all cached entries for CSV export
-	getAllCachedEntries(): PhotoCacheEntry[] {
-		return Array.from(this.cache.values())
+	// Get cache key
+	private getCacheKey(venueName: string, venueAddress: string): string {
+		return `${venueName}|${venueAddress}`
 	}
 
 	// Clear cache
-	clear(): void {
+	clearCache(): void {
 		this.cache.clear()
 	}
 
-	// Get cache statistics
-	getStats(): { total: number; recent: number } {
-		const now = new Date()
-		const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000)
+	// Get cache size
+	getCacheSize(): number {
+		return this.cache.size
+	}
 
-		let recent = 0
-		this.cache.forEach((entry) => {
-			if (new Date(entry.last_updated) > oneDayAgo) {
-				recent++
-			}
-		})
-
-		return {
-			total: this.cache.size,
-			recent,
-		}
+	// Export cache for CSV update
+	exportCache(): PhotoCacheEntry[] {
+		return Array.from(this.cache.values())
 	}
 }

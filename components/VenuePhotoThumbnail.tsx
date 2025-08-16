@@ -25,10 +25,10 @@ export default function VenuePhotoThumbnail({
 	const [imageLoading, setImageLoading] = useState(true)
 	const [photoError, setPhotoError] = useState(false)
 
-	// Size configuration
+	// Always use the same size as cached photos (300x200) for consistency
 	const sizeConfig = {
-		sm: { width: 120, height: 80, className: "aspect-[3/2]" },
-		md: { width: 250, height: 167, className: "aspect-[3/2]" },
+		sm: { width: 300, height: 200, className: "aspect-[3/2]" },
+		md: { width: 300, height: 200, className: "aspect-[3/2]" },
 		lg: { width: 300, height: 200, className: "aspect-[3/2]" },
 	}
 
@@ -42,17 +42,22 @@ export default function VenuePhotoThumbnail({
 
 	// Memoize the fetch function to prevent recreation on every render
 	const fetchPhoto = useCallback(async () => {
+		// If we have a cached photo reference from CSV, use it directly
+		if (cachedPhotoRef) {
+			const photoUrl = `/api/google-places-photo?photoRef=${encodeURIComponent(
+				cachedPhotoRef
+			)}&maxWidth=300&maxHeight=200`
+			setPhotoUrl(photoUrl)
+			return
+		}
+
 		// Check photo cache first
 		const photoCache = PhotoCache.getInstance()
 		if (photoCache.hasCachedPhoto(venueName, neighborhood || "")) {
 			const cached = photoCache.getCachedPhoto(venueName, neighborhood || "")
 			if (cached) {
-				// Adjust the cached URL to match our size requirements
-				const adjustedUrl = cached.photo_url.replace(
-					/maxWidth=\d+&maxHeight=\d+/,
-					`maxWidth=${config.width}&maxHeight=${config.height}`
-				)
-				setPhotoUrl(adjustedUrl)
+				// Use the cached URL directly - no adjustments needed
+				setPhotoUrl(cached.photo_url)
 				return
 			}
 		}
@@ -87,24 +92,26 @@ export default function VenuePhotoThumbnail({
 								photoRef
 							)
 
-							// Use our server-side photo endpoint
-							const photoUrl = `/api/google-places-photo?photoRef=${encodeURIComponent(
-								photoRef
-							)}&maxWidth=${config.width}&maxHeight=${config.height}`
-							setPhotoUrl(photoUrl)
-							return
+							// Get the cached URL (which will be consistent 300x200)
+							const cached = photoCache.getCachedPhoto(
+								venueName,
+								neighborhood || ""
+							)
+							if (cached) {
+								setPhotoUrl(cached.photo_url)
+								return
+							}
 						}
 					}
 				}
 			}
 
-			// If we get here, no photo was found
 			setPhotoError(true)
 		} catch (error) {
 			console.warn(`Could not get photo for ${venueName}:`, error)
 			setPhotoError(true)
 		}
-	}, [venueName, neighborhood, config.width, config.height])
+	}, [venueName, neighborhood, cachedPhotoRef])
 
 	useEffect(() => {
 		fetchPhoto()

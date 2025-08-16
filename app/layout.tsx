@@ -28,6 +28,25 @@ export default function RootLayout({
 }) {
 	return (
 		<html lang="en">
+			{/* Google Analytics - Only in production */}
+			{process.env.NODE_ENV === "production" && (
+				<>
+					<script
+						async
+						src="https://www.googletagmanager.com/gtag/js?id=G-JXRC6SNZ0B"
+					/>
+					<script
+						dangerouslySetInnerHTML={{
+							__html: `
+								window.dataLayer = window.dataLayer || [];
+								function gtag(){dataLayer.push(arguments);}
+								gtag('js', new Date());
+								gtag('config', 'G-JXRC6SNZ0B');
+							`,
+						}}
+					/>
+				</>
+			)}
 			<body
 				className={`${cardo.variable} ${josefinSans.variable} font-sans antialiased`}
 			>

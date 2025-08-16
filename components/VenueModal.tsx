@@ -4,9 +4,10 @@ import { Venue } from "@/types/venue"
 import { getRatingColor, getRatingBgColor } from "@/lib/utils"
 import VenueHeroPhoto from "./VenueHeroPhoto"
 import PhotoAttribution from "./PhotoAttribution"
+import { useEffect } from "react"
 
 interface VenueModalProps {
-	venue: Venue | null
+	venue: Venue
 	isOpen: boolean
 	onClose: () => void
 }
@@ -16,10 +17,22 @@ export default function VenueModal({
 	isOpen,
 	onClose,
 }: VenueModalProps) {
-	if (!isOpen || !venue) return null
+	if (!isOpen) return null
+
+	useEffect(() => {
+		const handleEscKey = (event: KeyboardEvent) => {
+			if (event.key === "Escape") {
+				onClose()
+			}
+		}
+
+		document.addEventListener("keydown", handleEscKey)
+		return () => {
+			document.removeEventListener("keydown", handleEscKey)
+		}
+	}, [onClose])
 
 	const handleBackdropClick = (e: React.MouseEvent) => {
-		// Only close if clicking the backdrop, not the modal content
 		if (e.target === e.currentTarget) {
 			onClose()
 		}
@@ -82,7 +95,16 @@ export default function VenueModal({
 							</span>
 						</div>
 						<p className="text-text-secondary font-sans text-base">
-							{venue.address}
+							<a
+								href={`https://maps.google.com/?q=${encodeURIComponent(
+									venue.address
+								)}`}
+								target="_blank"
+								rel="noopener noreferrer"
+								className="hover:text-primary transition-colors underline"
+							>
+								{venue.address}
+							</a>
 						</p>
 					</div>
 					<button

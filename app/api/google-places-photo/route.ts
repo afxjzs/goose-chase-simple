@@ -17,21 +17,12 @@ export async function GET(req: NextRequest) {
 	}
 
 	try {
-		console.log(`Fetching photo with ref: ${photoRef.substring(0, 20)}...`)
-
 		// Fetch the photo using Google Places Photo API
 		const photoUrl = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=${maxWidth}&photoreference=${photoRef}&key=${apiKey}`
-		console.log(`Photo URL: ${photoUrl}`)
 
 		const response = await fetch(photoUrl, {
 			redirect: "follow",
 		})
-
-		console.log(`Photo response status: ${response.status}`)
-		console.log(
-			`Photo response headers:`,
-			Object.fromEntries(response.headers.entries())
-		)
 
 		if (!response.ok) {
 			console.error("Photo fetch failed:", response.status, response.statusText)
@@ -48,7 +39,6 @@ export async function GET(req: NextRequest) {
 
 		// Get the photo data
 		const photoBuffer = await response.arrayBuffer()
-		console.log(`Photo buffer size: ${photoBuffer.byteLength} bytes`)
 
 		// Set appropriate headers for the image
 		const headers = new Headers()
