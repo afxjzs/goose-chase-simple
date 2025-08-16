@@ -235,7 +235,7 @@ export default function GoogleMapsMap({
 
 	if (!apiKey) {
 		return (
-			<div className="w-full h-96 bg-gray-100 rounded-lg flex items-center justify-center">
+			<div className="w-full h-full bg-gray-100 rounded-lg flex items-center justify-center">
 				<div className="text-center">
 					<div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
 					<p className="text-gray-600">Loading map...</p>
@@ -245,7 +245,7 @@ export default function GoogleMapsMap({
 	}
 
 	return (
-		<div className="w-full h-96 bg-gray-100 rounded-lg overflow-hidden">
+		<div className="w-full h-full bg-gray-100 rounded-lg overflow-hidden">
 			<div ref={mapRef} className="w-full h-full" />
 		</div>
 	)

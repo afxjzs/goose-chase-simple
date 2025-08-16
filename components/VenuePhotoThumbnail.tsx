@@ -1,7 +1,7 @@
 "use client"
 
-import Image from "next/image"
 import { useState, useEffect, useMemo, useCallback } from "react"
+import Image from "next/image"
 import { PhotoCache } from "@/lib/photoCache"
 
 interface VenuePhotoThumbnailProps {
@@ -10,6 +10,7 @@ interface VenuePhotoThumbnailProps {
 	neighborhood?: string
 	className?: string
 	size?: "sm" | "md" | "lg"
+	cachedPhotoRef?: string
 }
 
 export default function VenuePhotoThumbnail({
@@ -18,11 +19,13 @@ export default function VenuePhotoThumbnail({
 	neighborhood,
 	className = "",
 	size = "lg",
+	cachedPhotoRef,
 }: VenuePhotoThumbnailProps) {
 	const [photoUrl, setPhotoUrl] = useState<string | null>(null)
 	const [imageLoading, setImageLoading] = useState(true)
 	const [photoError, setPhotoError] = useState(false)
 
+	// Size configuration
 	const sizeConfig = {
 		sm: { width: 120, height: 80, className: "aspect-[3/2]" },
 		md: { width: 250, height: 167, className: "aspect-[3/2]" },

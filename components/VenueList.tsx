@@ -7,9 +7,16 @@ import VenueCard from "./VenueCard"
 interface VenueListProps {
 	venues: Venue[]
 	onVenueClick: (venue: Venue) => void
+	onFilterChange?: (filteredVenues: Venue[]) => void
+	isCompact?: boolean
 }
 
-export default function VenueList({ venues, onVenueClick }: VenueListProps) {
+export default function VenueList({
+	venues,
+	onVenueClick,
+	onFilterChange,
+	isCompact = false,
+}: VenueListProps) {
 	const [searchTerm, setSearchTerm] = useState("")
 	const [selectedType, setSelectedType] = useState("")
 	const [selectedNeighborhood, setSelectedNeighborhood] = useState("")
@@ -156,15 +163,44 @@ export default function VenueList({ venues, onVenueClick }: VenueListProps) {
 		})
 	}, [venues, searchTerm, selectedType, selectedNeighborhood, keywordFilter])
 
+	// Update parent component with filtered venues
+	useEffect(() => {
+		if (onFilterChange) {
+			onFilterChange(filteredVenues)
+		}
+	}, [filteredVenues, onFilterChange])
+
+	// Clear all filters
+	const clearAllFilters = () => {
+		setSearchTerm("")
+		setSelectedType("")
+		setSelectedNeighborhood("")
+		setKeywordFilter("")
+		setShowKeywordSuggestions(false)
+		setKeywordSuggestions([])
+	}
+
 	return (
 		<div className="space-y-6">
 			{/* Filters */}
-			<div className="bg-white rounded-lg shadow-lg p-6">
-				<h3 className="font-cardo text-xl font-bold text-text-primary mb-4">
+			<div
+				className={`bg-white rounded-lg shadow-lg ${isCompact ? "p-3" : "p-6"}`}
+			>
+				<h3
+					className={`font-cardo font-bold text-text-primary mb-4 ${
+						isCompact ? "text-lg" : "text-xl"
+					}`}
+				>
 					Filter Venues
 				</h3>
 
-				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+				<div
+					className={`grid gap-4 ${
+						isCompact
+							? "grid-cols-1"
+							: "grid-cols-1 md:grid-cols-2 lg:grid-cols-4"
+					}`}
+				>
 					{/* Search */}
 					<div>
 						<label className="block font-sans text-sm font-medium text-text-secondary mb-2">
@@ -175,7 +211,7 @@ export default function VenueList({ venues, onVenueClick }: VenueListProps) {
 							placeholder="Venue name or address..."
 							value={searchTerm}
 							onChange={(e) => setSearchTerm(e.target.value)}
-							className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent font-sans"
+							className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent font-sans text-base"
 						/>
 					</div>
 
@@ -187,7 +223,7 @@ export default function VenueList({ venues, onVenueClick }: VenueListProps) {
 						<select
 							value={selectedType}
 							onChange={(e) => setSelectedType(e.target.value)}
-							className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent font-sans"
+							className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent font-sans text-base"
 						>
 							<option value="">All Types</option>
 							{venueTypes.map((type) => (
@@ -206,7 +242,7 @@ export default function VenueList({ venues, onVenueClick }: VenueListProps) {
 						<select
 							value={selectedNeighborhood}
 							onChange={(e) => setSelectedNeighborhood(e.target.value)}
-							className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent font-sans"
+							className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent font-sans text-base"
 						>
 							<option value="">All Neighborhoods</option>
 							{neighborhoods.map((hood) => (
@@ -229,7 +265,7 @@ export default function VenueList({ venues, onVenueClick }: VenueListProps) {
 								placeholder="Filter by keywords..."
 								value={keywordFilter}
 								onChange={(e) => handleKeywordInputChange(e.target.value)}
-								className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent font-sans"
+								className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent font-sans text-base"
 							/>
 							{showKeywordSuggestions && (
 								<div
@@ -251,21 +287,33 @@ export default function VenueList({ venues, onVenueClick }: VenueListProps) {
 					</div>
 				</div>
 
-				{/* Results Count */}
-				<div className="mt-4 pt-4 border-t border-gray-200">
+				{/* Results Count and Clear Button */}
+				<div className="mt-4 pt-4 border-t border-gray-200 flex justify-between items-center">
 					<p className="font-sans text-sm text-text-muted">
 						Showing {filteredVenues.length} of {venues.length} venues
 					</p>
+					{(searchTerm ||
+						selectedType ||
+						selectedNeighborhood ||
+						keywordFilter) && (
+						<button
+							onClick={clearAllFilters}
+							className="px-4 py-2 bg-accent-tiffany text-white rounded-lg hover:bg-accent-tiffany/80 transition-colors font-sans text-sm"
+						>
+							Clear All
+						</button>
+					)}
 				</div>
 			</div>
 
-			{/* Venue Grid */}
-			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+			{/* Venue Grid - Responsive with proper sizing */}
+			<div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
 				{filteredVenues.map((venue) => (
 					<VenueCard
 						key={venue.name}
 						venue={venue}
 						onClick={() => onVenueClick(venue)}
+						isCompact={isCompact}
 					/>
 				))}
 			</div>
@@ -277,12 +325,7 @@ export default function VenueList({ venues, onVenueClick }: VenueListProps) {
 						No venues match your current filters.
 					</p>
 					<button
-						onClick={() => {
-							setSearchTerm("")
-							setSelectedType("")
-							setSelectedNeighborhood("")
-							setKeywordFilter("")
-						}}
+						onClick={clearAllFilters}
 						className="mt-4 px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors font-sans"
 					>
 						Clear All Filters

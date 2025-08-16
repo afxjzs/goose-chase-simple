@@ -1,7 +1,7 @@
 "use client"
 
-import Image from "next/image"
 import { useState, useEffect, useCallback, useMemo } from "react"
+import Image from "next/image"
 import { PhotoCache } from "@/lib/photoCache"
 
 interface VenueHeroPhotoProps {
@@ -24,7 +24,10 @@ export default function VenueHeroPhoto({
 	const [photoError, setPhotoError] = useState(false)
 
 	// Memoize the cache key to prevent unnecessary re-renders
-	const cacheKey = useMemo(() => `${venueName}|${neighborhood || ""}`, [venueName, neighborhood])
+	const cacheKey = useMemo(
+		() => `${venueName}|${neighborhood || ""}`,
+		[venueName, neighborhood]
+	)
 
 	// Memoize the fetch function to prevent recreation on every render
 	const fetchPhoto = useCallback(async () => {

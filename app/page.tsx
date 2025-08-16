@@ -58,29 +58,111 @@ export default function Home() {
 				</div>
 			</header>
 
-			{/* Main Content */}
-			<main className="container mx-auto px-4 py-8">
-				{/* Map Section */}
-				<section className="mb-12">
-					<h2 className="font-cardo text-2xl font-bold text-text-primary mb-6">
-						Interactive Map
-					</h2>
-					<div className="bg-white rounded-lg shadow-lg overflow-hidden">
+			{/* Main Content - Fixed Layout */}
+			<main className="relative">
+				{/* Desktop Layout: Cards on Left, Map on Right */}
+				<div className="hidden lg:flex h-[calc(100vh-200px)]">
+					{/* Left Side - Venue List (2/3 to 3/4) */}
+					<div className="w-3/4 h-full overflow-y-auto bg-white">
+						<div className="p-6">
+							<VenueList
+								venues={venues}
+								onVenueClick={handleVenueSelect}
+								onFilterChange={setFilteredVenues}
+								isCompact={false}
+							/>
+						</div>
+					</div>
+
+					{/* Right Side - Map (1/3 to 1/4) - FULL HEIGHT */}
+					<div className="w-1/4 h-full">
+						<div className="w-full h-full">
+							<GoogleMapsMap
+								venues={filteredVenues}
+								onVenueClick={handleVenueSelect}
+							/>
+						</div>
+					</div>
+				</div>
+
+				{/* Mobile Layout: Full Width Map with Compact Overlay */}
+				<div className="lg:hidden">
+					{/* Full Width Map - Much Taller */}
+					<div className="h-[60vh] w-full">
 						<GoogleMapsMap
 							venues={filteredVenues}
 							onVenueClick={handleVenueSelect}
 						/>
 					</div>
-				</section>
 
-				{/* Venue List Section */}
-				<section>
-					<h2 className="font-cardo text-2xl font-bold text-text-primary mb-6">
-						Venue Directory
-					</h2>
-					<VenueList venues={venues} onVenueClick={handleVenueSelect} />
-				</section>
+					{/* Content Overlay Below Map - More Compact */}
+					<div className="bg-white rounded-t-3xl -mt-2 relative z-10 min-h-[20vh]">
+						<div className="p-3 pt-4">
+							<VenueList
+								venues={venues}
+								onVenueClick={handleVenueSelect}
+								onFilterChange={setFilteredVenues}
+								isCompact={true}
+							/>
+						</div>
+					</div>
+				</div>
 			</main>
+
+			{/* Footer */}
+			<footer className="bg-white/80 backdrop-blur-sm border-t border-gray-200 py-6">
+				<div className="container mx-auto px-4">
+					<div className="flex flex-col md:flex-row justify-between items-center">
+						{/* Left side - Copyright, Doug, and Buy me a coffee */}
+						<div className="text-center md:text-left mb-4 md:mb-0">
+							<p className="font-sans text-sm text-gray-600">
+								© 2025 Goose Chase | Built by{" "}
+								<a
+									href="https://doug.is"
+									target="_blank"
+									rel="noopener noreferrer"
+									className="text-primary hover:text-primary-dark transition-colors underline"
+								>
+									Doug
+								</a>{" "}
+								|{" "}
+								<a
+									href="https://buymeacoffee.com/afxjzs"
+									target="_blank"
+									rel="noopener noreferrer"
+									className="text-primary hover:text-primary-dark transition-colors underline"
+								>
+									Buy me a coffee
+								</a>
+							</p>
+						</div>
+
+						{/* Right side - Dante's Twitter and Barstool article */}
+						<div className="text-center md:text-right">
+							<p className="font-sans text-sm text-gray-600">
+								Based on recommendations by{" "}
+								<a
+									href="https://twitter.com/dantethedon"
+									target="_blank"
+									rel="noopener noreferrer"
+									className="text-primary hover:text-primary-dark transition-colors underline"
+								>
+									@DanteTheDon
+								</a>
+								's{" "}
+								<a
+									href="https://www.barstoolsports.com/blog/3548304/chicago-is-an-elite-bachelor-party-destination-in-america-and-here-is-your-definitive-guide"
+									target="_blank"
+									rel="noopener noreferrer"
+									className="text-primary hover:text-primary-dark transition-colors underline"
+								>
+									Barstool Sports article
+								</a>
+							</p>
+						</div>
+					</div>
+				</div>
+			</footer>
 
 			{/* Modal */}
 			{isModalOpen && selectedVenue && (

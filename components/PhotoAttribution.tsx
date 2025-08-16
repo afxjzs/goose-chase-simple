@@ -13,7 +13,7 @@ export default function PhotoAttribution({
 
 	return (
 		<div
-			className={`mt-2 text-xs text-text-muted font-sans ${className}`}
+			className={`mt-2 text-sm text-text-muted font-sans ${className}`}
 			dangerouslySetInnerHTML={{ __html: html }}
 		/>
 	)

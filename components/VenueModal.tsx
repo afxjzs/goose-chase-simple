@@ -55,7 +55,7 @@ export default function VenueModal({
 				<span className={`font-semibold ${getRatingColor(rating)}`}>
 					⭐ {rating}
 				</span>
-				<span className="text-sm text-text-muted font-sans">({source})</span>
+				<span className="text-base text-text-muted font-sans">({source})</span>
 			</div>
 		)
 	}
@@ -73,15 +73,17 @@ export default function VenueModal({
 							{venue.name}
 						</h2>
 						<div className="flex items-center gap-3 mb-3">
-							<span className="px-3 py-1 bg-primary text-white rounded-full text-sm font-medium font-sans">
+							<span className="px-3 py-1 bg-primary text-white rounded-full text-base font-medium font-sans">
 								{venue.venue_type}
 							</span>
 							<span className="text-text-muted">•</span>
-							<span className="text-text-secondary font-sans">
+							<span className="text-text-secondary font-sans text-base">
 								{venue.neighborhood}
 							</span>
 						</div>
-						<p className="text-text-secondary font-sans">{venue.address}</p>
+						<p className="text-text-secondary font-sans text-base">
+							{venue.address}
+						</p>
 					</div>
 					<button
 						onClick={onClose}
@@ -114,7 +116,7 @@ export default function VenueModal({
 
 						{/* Ratings */}
 						<div className="mb-6">
-							<h3 className="font-cardo text-lg font-bold text-text-primary mb-3">
+							<h3 className="font-cardo text-xl font-bold text-text-primary mb-3">
 								Ratings
 							</h3>
 							<div className="space-y-2">
@@ -131,7 +133,7 @@ export default function VenueModal({
 									href={venue.google_maps_url}
 									target="_blank"
 									rel="noopener noreferrer"
-									className="block w-full px-4 py-2 bg-primary text-white text-center rounded-lg hover:bg-primary-dark transition-colors font-sans"
+									className="block w-full px-4 py-3 bg-primary text-white text-center rounded-lg hover:bg-primary-dark transition-colors font-sans text-base"
 								>
 									📍 View on Google Maps
 								</a>
@@ -141,7 +143,7 @@ export default function VenueModal({
 									href={venue.yelp_url}
 									target="_blank"
 									rel="noopener noreferrer"
-									className="block w-full px-4 py-2 bg-accent-celadon text-text-primary text-center rounded-lg hover:bg-accent-celadon/80 transition-colors font-sans"
+									className="block w-full px-4 py-3 bg-accent-celadon text-text-primary text-center rounded-lg hover:bg-accent-celadon/80 transition-colors font-sans text-base"
 								>
 									🍽️ View on Yelp
 								</a>
@@ -151,7 +153,7 @@ export default function VenueModal({
 									href={venue.tripadvisor_url}
 									target="_blank"
 									rel="noopener noreferrer"
-									className="block w-full px-4 py-2 bg-accent-tiffany text-white text-center rounded-lg hover:bg-accent-tiffany/80 transition-colors font-sans"
+									className="block w-full px-4 py-3 bg-accent-tiffany text-white text-center rounded-lg hover:bg-accent-tiffany/80 transition-colors font-sans text-base"
 								>
 									🌍 View on TripAdvisor
 								</a>
@@ -167,7 +169,7 @@ export default function VenueModal({
 								<h3 className="font-cardo text-xl font-bold text-text-primary mb-3">
 									About This Venue
 								</h3>
-								<p className="text-text-secondary font-sans leading-relaxed">
+								<p className="text-text-secondary font-sans text-base leading-relaxed">
 									{venue.blog_description}
 								</p>
 							</div>
@@ -179,7 +181,7 @@ export default function VenueModal({
 								<h3 className="font-cardo text-xl font-bold text-text-primary mb-3">
 									Description
 								</h3>
-								<p className="text-text-secondary font-sans leading-relaxed">
+								<p className="text-text-secondary font-sans text-base leading-relaxed">
 									{venue.general_description}
 								</p>
 							</div>
@@ -195,7 +197,7 @@ export default function VenueModal({
 									{keywords.map((keyword, index) => (
 										<span
 											key={index}
-											className="px-3 py-2 bg-accent-nonphoto text-text-primary rounded-lg font-sans"
+											className="px-3 py-2 bg-accent-nonphoto text-text-primary rounded-lg font-sans text-base"
 										>
 											{keyword}
 										</span>
@@ -212,10 +214,10 @@ export default function VenueModal({
 
 							{venue.yelp_reviews_count && (
 								<div className="flex justify-between items-center py-2 border-b border-gray-100">
-									<span className="font-sans text-text-secondary">
+									<span className="font-sans text-text-secondary text-base">
 										Yelp Reviews
 									</span>
-									<span className="font-sans font-medium text-text-primary">
+									<span className="font-sans font-medium text-text-primary text-base">
 										{venue.yelp_reviews_count.toLocaleString()}
 									</span>
 								</div>
@@ -223,10 +225,10 @@ export default function VenueModal({
 
 							{venue.google_maps_reviews_count && (
 								<div className="flex justify-between items-center py-2 border-b border-gray-100">
-									<span className="font-sans text-text-secondary">
+									<span className="font-sans text-text-secondary text-base">
 										Google Reviews
 									</span>
-									<span className="font-sans font-medium text-text-primary">
+									<span className="font-sans font-medium text-text-primary text-base">
 										{venue.google_maps_reviews_count.toLocaleString()}
 									</span>
 								</div>
@@ -234,10 +236,10 @@ export default function VenueModal({
 
 							{venue.tripadvisor_reviews_count && (
 								<div className="flex justify-between items-center py-2 border-b border-gray-100">
-									<span className="font-sans text-text-secondary">
+									<span className="font-sans text-text-secondary text-base">
 										TripAdvisor Reviews
 									</span>
-									<span className="font-sans font-medium text-text-primary">
+									<span className="font-sans font-medium text-text-primary text-base">
 										{venue.tripadvisor_reviews_count.toLocaleString()}
 									</span>
 								</div>
@@ -245,10 +247,10 @@ export default function VenueModal({
 
 							{venue.processed_at && (
 								<div className="flex justify-between items-center py-2">
-									<span className="font-sans text-text-secondary">
+									<span className="font-sans text-text-secondary text-base">
 										Last Updated
 									</span>
-									<span className="font-sans font-medium text-text-primary">
+									<span className="font-sans font-medium text-text-primary text-base">
 										{new Date(venue.processed_at).toLocaleDateString()}
 									</span>
 								</div>
