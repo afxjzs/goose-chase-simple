@@ -124,7 +124,7 @@ export default function VenueList({
 
 	// Filter venues based on all criteria
 	const filteredVenues = useMemo(() => {
-		return venues.filter((venue) => {
+		const filtered = venues.filter((venue) => {
 			// Search term filter
 			if (
 				searchTerm &&
@@ -160,6 +160,19 @@ export default function VenueList({
 			}
 
 			return true
+		})
+
+		// Sort by Google Maps rating (highest first), then by name for venues without ratings
+		return filtered.sort((a, b) => {
+			const ratingA = a.google_maps_rating || 0
+			const ratingB = b.google_maps_rating || 0
+
+			if (ratingA !== ratingB) {
+				return ratingB - ratingA // Highest rating first
+			}
+
+			// If ratings are the same (or both 0), sort alphabetically by name
+			return a.name.localeCompare(b.name)
 		})
 	}, [venues, searchTerm, selectedType, selectedNeighborhood, keywordFilter])
 
