@@ -150,7 +150,7 @@ export default function GoogleMapsMap({
 				icon: {
 					url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
 						<svg width="30" height="30" xmlns="http://www.w3.org/2000/svg">
-							<circle cx="15" cy="15" r="15" fill="white" stroke="#3B82F6" stroke-width="2"/>
+							<circle cx="15" cy="15" r="15" fill="white" stroke="#73AB84" stroke-width="2"/>
 							<text x="15" y="20" text-anchor="middle" font-size="16">${getMarkerIcon(
 								venue.venue_type
 							)}</text>

@@ -18,7 +18,70 @@ const josefinSans = Josefin_Sans({
 
 export const metadata: Metadata = {
 	title: "Goose Chase | Chicago Venues",
-	description: "Interactive map of Chicago venues and restaurants",
+	description:
+		"Explore 122 Chicago venues from @DanteTheDon's Barstool Sports article on Chicago bachelor party destinations. Interactive map with photos, ratings, and details.",
+	keywords: [
+		"Chicago",
+		"venues",
+		"restaurants",
+		"bars",
+		"bachelor party",
+		"nightlife",
+		"dining",
+		"map",
+	],
+	authors: [{ name: "Doug", url: "https://doug.is" }],
+	creator: "Doug",
+	publisher: "Goose Chase",
+	formatDetection: {
+		email: false,
+		address: false,
+		telephone: false,
+	},
+	metadataBase: new URL("https://goose-chase-simple.vercel.app"),
+	alternates: {
+		canonical: "/",
+	},
+	openGraph: {
+		type: "website",
+		locale: "en_US",
+		url: "https://goose-chase-simple.vercel.app",
+		siteName: "Goose Chase",
+		title: "Goose Chase | Chicago Venues",
+		description:
+			"Explore 122 Chicago venues from @DanteTheDon's Barstool Sports article on Chicago bachelor party destinations. Interactive map with photos, ratings, and details.",
+		images: [
+			{
+				url: "/goosechase-modal-screenshot.png",
+				width: 1200,
+				height: 630,
+				alt: "Goose Chase - Chicago Venues Modal with Photo and Details",
+			},
+		],
+	},
+	twitter: {
+		card: "summary_large_image",
+		site: "@afxjzs",
+		creator: "@afxjzs",
+		title: "Goose Chase | Chicago Venues",
+		description:
+			"Explore 122 Chicago venues from @DanteTheDon's Barstool Sports article on Chicago bachelor party destinations. Interactive map with photos, ratings, and details.",
+		images: ["/goosechase-modal-screenshot.png"],
+	},
+	robots: {
+		index: true,
+		follow: true,
+		googleBot: {
+			index: true,
+			follow: true,
+			"max-video-preview": -1,
+			"max-image-preview": "large",
+			"max-snippet": -1,
+		},
+	},
+	verification: {
+		google: "your-google-verification-code", // Add your Google Search Console verification code if you have one
+	},
 }
 
 export default function RootLayout({

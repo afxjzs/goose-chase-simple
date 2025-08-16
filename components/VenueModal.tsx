@@ -189,7 +189,7 @@ export default function VenueModal({
 						{venue.blog_description && (
 							<div className="mb-6">
 								<h3 className="font-cardo text-xl font-bold text-text-primary mb-3">
-									About This Venue
+									What Dante Said
 								</h3>
 								<p className="text-text-secondary font-sans text-base leading-relaxed">
 									{venue.blog_description}
