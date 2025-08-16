@@ -19,7 +19,8 @@ export default function PhotoCachePage() {
 	const loadStats = async () => {
 		// Get cache stats
 		const photoCache = PhotoCache.getInstance()
-		setCacheStats(photoCache.getStats())
+		const cacheSize = photoCache.getCacheSize()
+		setCacheStats({ total: cacheSize, recent: 0 }) // We don't track recent anymore
 
 		// Get CSV stats
 		try {
@@ -39,7 +40,7 @@ export default function PhotoCachePage() {
 
 		try {
 			const photoCache = PhotoCache.getInstance()
-			const cachedEntries = photoCache.getAllCachedEntries()
+			const cachedEntries = photoCache.exportCache()
 
 			if (cachedEntries.length === 0) {
 				setUpdateResult("No cached photos to update CSV with")
@@ -72,7 +73,7 @@ export default function PhotoCachePage() {
 
 	const clearCache = () => {
 		const photoCache = PhotoCache.getInstance()
-		photoCache.clear()
+		photoCache.clearCache()
 		setCacheStats({ total: 0, recent: 0 })
 		setUpdateResult("Cache cleared")
 	}
