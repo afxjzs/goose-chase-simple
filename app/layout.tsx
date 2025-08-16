@@ -1,8 +1,20 @@
 import type { Metadata } from "next"
-import { Inter } from "next/font/google"
+import { Cardo, Josefin_Sans } from "next/font/google"
 import "./globals.css"
 
-const inter = Inter({ subsets: ["latin"] })
+const cardo = Cardo({
+	subsets: ["latin"],
+	weight: ["400", "700"],
+	variable: "--font-cardo",
+	display: "swap",
+})
+
+const josefinSans = Josefin_Sans({
+	subsets: ["latin"],
+	weight: ["300", "400", "600"],
+	variable: "--font-josefin-sans",
+	display: "swap",
+})
 
 export const metadata: Metadata = {
 	title: "Goose Chase | Chicago Venues",
@@ -16,7 +28,11 @@ export default function RootLayout({
 }) {
 	return (
 		<html lang="en">
-			<body className={inter.className}>{children}</body>
+			<body
+				className={`${cardo.variable} ${josefinSans.variable} font-sans antialiased`}
+			>
+				{children}
+			</body>
 		</html>
 	)
 }

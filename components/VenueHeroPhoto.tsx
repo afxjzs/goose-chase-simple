@@ -1,6 +1,7 @@
 "use client"
+
 import Image from "next/image"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback, useMemo } from "react"
 import { PhotoCache } from "@/lib/photoCache"
 
 interface VenueHeroPhotoProps {
@@ -8,7 +9,6 @@ interface VenueHeroPhotoProps {
 	venueType: string
 	neighborhood?: string
 	className?: string
-	// Allow passing cached photo data directly
 	cachedPhotoRef?: string
 }
 
@@ -23,80 +23,89 @@ export default function VenueHeroPhoto({
 	const [imageLoading, setImageLoading] = useState(true)
 	const [photoError, setPhotoError] = useState(false)
 
-	useEffect(() => {
-		const fetchPhoto = async () => {
-			// If we have cached photo data, use it immediately
-			if (cachedPhotoRef) {
-				const photoUrl = `/api/google-places-photo?photoRef=${encodeURIComponent(
-					cachedPhotoRef
-				)}&maxWidth=1200`
-				setPhotoUrl(photoUrl)
-				return
-			}
+	// Memoize the cache key to prevent unnecessary re-renders
+	const cacheKey = useMemo(() => `${venueName}|${neighborhood || ""}`, [venueName, neighborhood])
 
-			// Check photo cache first
-			const photoCache = PhotoCache.getInstance()
-			if (photoCache.hasCachedPhoto(venueName, neighborhood || "")) {
-				const cached = photoCache.getCachedPhoto(venueName, neighborhood || "")
-				if (cached) {
-					setPhotoUrl(cached.photo_url)
-					return
-				}
-			}
+	// Memoize the fetch function to prevent recreation on every render
+	const fetchPhoto = useCallback(async () => {
+		// If we have cached photo data from props, use it immediately
+		if (cachedPhotoRef) {
+			const photoUrl = `/api/google-places-photo?photoRef=${encodeURIComponent(
+				cachedPhotoRef
+			)}&maxWidth=300&maxHeight=200`
+			setPhotoUrl(photoUrl)
+			return
+		}
 
-			// No cache - fetch from Google Places API
-			try {
-				console.log(`Fetching photo for ${venueName}...`)
-
-				// Search for the venue using Google Places API
-				const searchQuery = `${venueName} ${neighborhood || ""} Chicago`
-				const searchResponse = await fetch(
-					`/api/google-places-search?query=${encodeURIComponent(searchQuery)}`
+		// Check photo cache first
+		const photoCache = PhotoCache.getInstance()
+		if (photoCache.hasCachedPhoto(venueName, neighborhood || "")) {
+			const cached = photoCache.getCachedPhoto(venueName, neighborhood || "")
+			if (cached) {
+				// Adjust the cached URL to match our size requirements
+				const adjustedUrl = cached.photo_url.replace(
+					/maxWidth=\d+&maxHeight=\d+/,
+					`maxWidth=300&maxHeight=200`
 				)
-
-				if (searchResponse.ok) {
-					const searchData = await searchResponse.json()
-					if (searchData.results && searchData.results.length > 0) {
-						const place = searchData.results[0]
-
-						// Get photos for this place
-						const photosResponse = await fetch(
-							`/api/google-places-photos?placeId=${place.place_id}`
-						)
-						if (photosResponse.ok) {
-							const photosData = await photosResponse.json()
-							if (photosData.photos && photosData.photos.length > 0) {
-								const photoRef = photosData.photos[0].photo_reference
-
-								// Cache this photo for future use
-								photoCache.cachePhoto(
-									venueName,
-									neighborhood || "",
-									place.place_id,
-									photoRef
-								)
-
-								// Use our server-side photo endpoint with consistent size
-								const photoUrl = `/api/google-places-photo?photoRef=${encodeURIComponent(
-									photoRef
-								)}&maxWidth=300&maxHeight=200`
-								setPhotoUrl(photoUrl)
-								return
-							}
-						}
-					}
-				}
-
-				// If we get here, no photo was found
-				setPhotoError(true)
-			} catch (error) {
-				console.warn(`Could not get photo for ${venueName}:`, error)
-				setPhotoError(true)
+				setPhotoUrl(adjustedUrl)
+				return
 			}
 		}
 
+		// No cache - fetch from Google Places API
+		try {
+			console.log(`Fetching photo for ${venueName}...`)
+
+			// Search for the venue using Google Places API
+			const searchQuery = `${venueName} ${neighborhood || ""} Chicago`
+			const searchResponse = await fetch(
+				`/api/google-places-search?query=${encodeURIComponent(searchQuery)}`
+			)
+
+			if (searchResponse.ok) {
+				const searchData = await searchResponse.json()
+				if (searchData.results && searchData.results.length > 0) {
+					const place = searchData.results[0]
+
+					// Get photos for this place
+					const photosResponse = await fetch(
+						`/api/google-places-photos?placeId=${place.place_id}`
+					)
+					if (photosResponse.ok) {
+						const photosData = await photosResponse.json()
+						if (photosData.photos && photosData.photos.length > 0) {
+							const photoRef = photosData.photos[0].photo_reference
+
+							// Cache this photo for future use
+							photoCache.cachePhoto(
+								venueName,
+								neighborhood || "",
+								place.place_id,
+								photoRef
+							)
+
+							// Use our server-side photo endpoint with consistent size
+							const photoUrl = `/api/google-places-photo?photoRef=${encodeURIComponent(
+								photoRef
+							)}&maxWidth=300&maxHeight=200`
+							setPhotoUrl(photoUrl)
+							return
+						}
+					}
+				}
+			}
+
+			// If we get here, no photo was found
+			setPhotoError(true)
+		} catch (error) {
+			console.warn(`Could not get photo for ${venueName}:`, error)
+			setPhotoError(true)
+		}
+	}, [venueName, neighborhood, cachedPhotoRef])
+
+	useEffect(() => {
 		fetchPhoto()
-	}, [venueName, venueType, neighborhood, cachedPhotoRef])
+	}, [fetchPhoto])
 
 	// Show loading state
 	if (imageLoading && !photoUrl) {

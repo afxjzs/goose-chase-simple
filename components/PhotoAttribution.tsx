@@ -5,12 +5,15 @@ interface PhotoAttributionProps {
 	className?: string
 }
 
-export default function PhotoAttribution({ html, className = "" }: PhotoAttributionProps) {
+export default function PhotoAttribution({
+	html,
+	className = "",
+}: PhotoAttributionProps) {
 	if (!html) return null
 
 	return (
-		<div 
-			className={`mt-2 text-xs text-gray-500 ${className}`}
+		<div
+			className={`mt-2 text-xs text-text-muted font-sans ${className}`}
 			dangerouslySetInnerHTML={{ __html: html }}
 		/>
 	)

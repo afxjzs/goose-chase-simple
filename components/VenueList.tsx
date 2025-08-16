@@ -100,10 +100,10 @@ export default function VenueList({ venues, onVenueClick }: VenueListProps) {
 	useEffect(() => {
 		const handleClickOutside = (event: MouseEvent) => {
 			if (
-				suggestionsRef.current &&
-				!suggestionsRef.current.contains(event.target as Node) &&
 				keywordInputRef.current &&
-				!keywordInputRef.current.contains(event.target as Node)
+				!keywordInputRef.current.contains(event.target as Node) &&
+				suggestionsRef.current &&
+				!suggestionsRef.current.contains(event.target as Node)
 			) {
 				setShowKeywordSuggestions(false)
 			}
@@ -121,15 +121,16 @@ export default function VenueList({ venues, onVenueClick }: VenueListProps) {
 			// Search term filter
 			if (
 				searchTerm &&
-				!venue.name.toLowerCase().includes(searchTerm.toLowerCase())
+				!venue.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
+				!venue.address.toLowerCase().includes(searchTerm.toLowerCase())
 			) {
 				return false
 			}
 
 			// Type filter (handle slash-separated types)
 			if (selectedType) {
-				const typeParts = venue.venue_type.split("/").map((t) => t.trim())
-				if (!typeParts.some((part) => part === selectedType)) {
+				const venueTypes = venue.venue_type.split("/").map((t) => t.trim())
+				if (!venueTypes.some((type) => type === selectedType)) {
 					return false
 				}
 			}
@@ -140,10 +141,10 @@ export default function VenueList({ venues, onVenueClick }: VenueListProps) {
 			}
 
 			// Keyword filter
-			if (keywordFilter && venue.keywords_tags) {
-				const cleanKeywords = getCleanKeywords(venue.keywords_tags)
+			if (keywordFilter) {
+				const venueKeywords = getCleanKeywords(venue.keywords_tags)
 				if (
-					!cleanKeywords.some((keyword) =>
+					!venueKeywords.some((keyword) =>
 						keyword.includes(keywordFilter.toLowerCase())
 					)
 				) {
@@ -155,135 +156,136 @@ export default function VenueList({ venues, onVenueClick }: VenueListProps) {
 		})
 	}, [venues, searchTerm, selectedType, selectedNeighborhood, keywordFilter])
 
-	const clearFilters = () => {
-		setSearchTerm("")
-		setSelectedType("")
-		setSelectedNeighborhood("")
-		setKeywordFilter("")
-		setShowKeywordSuggestions(false)
-		setKeywordSuggestions([])
-	}
-
 	return (
-		<div className="space-y-4">
-			{/* Search and Filters */}
-			<div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 mb-3">
+		<div className="space-y-6">
+			{/* Filters */}
+			<div className="bg-white rounded-lg shadow-lg p-6">
+				<h3 className="font-cardo text-xl font-bold text-text-primary mb-4">
+					Filter Venues
+				</h3>
+
+				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
 					{/* Search */}
-					<input
-						type="text"
-						placeholder="Search venues..."
-						value={searchTerm}
-						onChange={(e) => setSearchTerm(e.target.value)}
-						className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-					/>
+					<div>
+						<label className="block font-sans text-sm font-medium text-text-secondary mb-2">
+							Search
+						</label>
+						<input
+							type="text"
+							placeholder="Venue name or address..."
+							value={searchTerm}
+							onChange={(e) => setSearchTerm(e.target.value)}
+							className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent font-sans"
+						/>
+					</div>
 
 					{/* Type Filter */}
-					<select
-						value={selectedType}
-						onChange={(e) => setSelectedType(e.target.value)}
-						className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-					>
-						<option value="">All Types</option>
-						{venueTypes.map((type) => (
-							<option key={type} value={type}>
-								{type}
-							</option>
-						))}
-					</select>
+					<div>
+						<label className="block font-sans text-sm font-medium text-text-secondary mb-2">
+							Type
+						</label>
+						<select
+							value={selectedType}
+							onChange={(e) => setSelectedType(e.target.value)}
+							className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent font-sans"
+						>
+							<option value="">All Types</option>
+							{venueTypes.map((type) => (
+								<option key={type} value={type}>
+									{type}
+								</option>
+							))}
+						</select>
+					</div>
 
 					{/* Neighborhood Filter */}
-					<select
-						value={selectedNeighborhood}
-						onChange={(e) => setSelectedNeighborhood(e.target.value)}
-						className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-					>
-						<option value="">All Neighborhoods</option>
-						{neighborhoods.map((hood) => (
-							<option key={hood} value={hood}>
-								{hood}
-							</option>
-						))}
-					</select>
+					<div>
+						<label className="block font-sans text-sm font-medium text-text-secondary mb-2">
+							Neighborhood
+						</label>
+						<select
+							value={selectedNeighborhood}
+							onChange={(e) => setSelectedNeighborhood(e.target.value)}
+							className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent font-sans"
+						>
+							<option value="">All Neighborhoods</option>
+							{neighborhoods.map((hood) => (
+								<option key={hood} value={hood}>
+									{hood}
+								</option>
+							))}
+						</select>
+					</div>
 
 					{/* Keyword Filter with Autocomplete */}
 					<div className="relative">
-						<input
-							ref={keywordInputRef}
-							type="text"
-							placeholder="Filter by keywords..."
-							value={keywordFilter}
-							onChange={(e) => handleKeywordInputChange(e.target.value)}
-							onFocus={() => {
-								if (keywordFilter.trim()) {
-									const filtered = allKeywords.filter((keyword) =>
-										keyword.toLowerCase().includes(keywordFilter.toLowerCase())
-									)
-									setKeywordSuggestions(filtered)
-									setShowKeywordSuggestions(filtered.length > 0)
-								}
-							}}
-							className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-						/>
-
-						{/* Autocomplete Suggestions */}
-						{showKeywordSuggestions && (
-							<div
-								ref={suggestionsRef}
-								className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-48 overflow-y-auto"
-							>
-								{keywordSuggestions.map((suggestion, index) => (
-									<div
-										key={index}
-										onClick={() => handleKeywordSuggestionClick(suggestion)}
-										className="px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm border-b border-gray-100 last:border-b-0"
-									>
-										{suggestion}
-									</div>
-								))}
-							</div>
-						)}
+						<label className="block font-sans text-sm font-medium text-text-secondary mb-2">
+							Keywords/Tags
+						</label>
+						<div className="relative">
+							<input
+								ref={keywordInputRef}
+								type="text"
+								placeholder="Filter by keywords..."
+								value={keywordFilter}
+								onChange={(e) => handleKeywordInputChange(e.target.value)}
+								className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent font-sans"
+							/>
+							{showKeywordSuggestions && (
+								<div
+									ref={suggestionsRef}
+									className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-48 overflow-y-auto"
+								>
+									{keywordSuggestions.map((suggestion) => (
+										<button
+											key={suggestion}
+											onClick={() => handleKeywordSuggestionClick(suggestion)}
+											className="w-full text-left px-3 py-2 hover:bg-accent-celadon hover:text-white font-sans text-sm"
+										>
+											{suggestion}
+										</button>
+									))}
+								</div>
+							)}
+						</div>
 					</div>
 				</div>
 
-				{/* Results and Clear */}
-				<div className="flex justify-between items-center">
-					<div className="text-sm text-gray-600">
+				{/* Results Count */}
+				<div className="mt-4 pt-4 border-t border-gray-200">
+					<p className="font-sans text-sm text-text-muted">
 						Showing {filteredVenues.length} of {venues.length} venues
-					</div>
-					{(searchTerm ||
-						selectedType ||
-						selectedNeighborhood ||
-						keywordFilter) && (
-						<button
-							onClick={clearFilters}
-							className="text-sm text-blue-600 hover:text-blue-800 underline"
-						>
-							Clear all filters
-						</button>
-					)}
+					</p>
 				</div>
 			</div>
 
-			{/* Venues Grid */}
-			{filteredVenues.length > 0 ? (
-				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-					{filteredVenues.map((venue) => (
-						<VenueCard
-							key={venue.name}
-							venue={venue}
-							onClick={() => onVenueClick(venue)}
-						/>
-					))}
-				</div>
-			) : (
-				<div className="text-center py-8 text-gray-500">
-					<p>No venues match your current filters.</p>
+			{/* Venue Grid */}
+			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+				{filteredVenues.map((venue) => (
+					<VenueCard
+						key={venue.name}
+						venue={venue}
+						onClick={() => onVenueClick(venue)}
+					/>
+				))}
+			</div>
+
+			{/* No Results */}
+			{filteredVenues.length === 0 && (
+				<div className="text-center py-12">
+					<p className="font-sans text-lg text-text-muted">
+						No venues match your current filters.
+					</p>
 					<button
-						onClick={clearFilters}
-						className="text-blue-600 hover:text-blue-800 underline mt-2"
+						onClick={() => {
+							setSearchTerm("")
+							setSelectedType("")
+							setSelectedNeighborhood("")
+							setKeywordFilter("")
+						}}
+						className="mt-4 px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors font-sans"
 					>
-						Clear filters
+						Clear All Filters
 					</button>
 				</div>
 			)}

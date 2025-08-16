@@ -2,6 +2,31 @@ import Papa from "papaparse"
 import { Venue } from "@/types/venue"
 import { PhotoCache } from "./photoCache"
 
+export async function loadVenuesFromCSV(): Promise<Venue[]> {
+	try {
+		console.log("Fetching CSV file from /chicago_venues_full_output.csv...")
+		const response = await fetch("/chicago_venues_full_output.csv")
+
+		if (!response.ok) {
+			throw new Error(`HTTP error! status: ${response.status}`)
+		}
+
+		const csvText = await response.text()
+		if (!csvText || csvText.length === 0) {
+			throw new Error("CSV text is empty")
+		}
+
+		console.log("Parsing CSV...")
+		const parsedVenues = await parseVenuesCSV(csvText)
+		console.log(`Parsed ${parsedVenues.length} venues`)
+
+		return parsedVenues
+	} catch (error) {
+		console.error("Error loading venues from CSV:", error)
+		throw error
+	}
+}
+
 export async function parseVenuesCSV(csvText: string): Promise<Venue[]> {
 	return new Promise((resolve, reject) => {
 		Papa.parse(csvText, {
@@ -99,38 +124,36 @@ export async function parseVenuesCSV(csvText: string): Promise<Venue[]> {
 					// Filter out venues with invalid coordinates
 					const validVenues = venues.filter((venue) => {
 						if (!venue.coordinates) {
-							console.log(`No coordinates for ${venue.name}`)
+							console.warn(`Venue ${venue.name} has no coordinates`)
 							return false
 						}
-						const cleanCoords = venue.coordinates.replace(/"/g, "").trim()
-						const [lat, lng] = cleanCoords
-							.split(",")
-							.map((coord) => parseFloat(coord.trim()))
-						const isValid = !isNaN(lat) && !isNaN(lng)
-						if (!isValid) {
-							console.log(
-								`Invalid coordinates for ${venue.name}: ${venue.coordinates}`
+
+						const [lat, lng] = venue.coordinates.split(",")
+						const latNum = parseFloat(lat)
+						const lngNum = parseFloat(lng)
+
+						if (isNaN(latNum) || isNaN(lngNum)) {
+							console.warn(
+								`Venue ${venue.name} has invalid coordinates: ${venue.coordinates}`
 							)
+							return false
 						}
-						return isValid
+
+						return true
 					})
 
 					console.log(
-						`Parsed ${venues.length} total venues, ${validVenues.length} with valid coordinates`
+						`Found ${validVenues.length} venues with valid coordinates`
 					)
-
-					// Load the photo cache with any existing data
-					photoCache.loadFromVenues(validVenues)
-
 					resolve(validVenues)
 				} catch (error: any) {
-					console.error("Error in CSV parsing:", error)
-					reject(new Error(`Failed to parse CSV: ${error.message}`))
+					console.error("Error parsing CSV:", error)
+					reject(error)
 				}
 			},
 			error: (error: any) => {
 				console.error("CSV parsing error:", error)
-				reject(new Error(`CSV parsing error: ${error.message}`))
+				reject(error)
 			},
 		})
 	})

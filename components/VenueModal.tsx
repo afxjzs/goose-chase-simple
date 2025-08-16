@@ -55,7 +55,7 @@ export default function VenueModal({
 				<span className={`font-semibold ${getRatingColor(rating)}`}>
 					⭐ {rating}
 				</span>
-				<span className="text-sm text-gray-600">({source})</span>
+				<span className="text-sm text-text-muted font-sans">({source})</span>
 			</div>
 		)
 	}
@@ -69,21 +69,23 @@ export default function VenueModal({
 				{/* Header */}
 				<div className="flex justify-between items-start p-6 border-b border-gray-200">
 					<div className="flex-1">
-						<h2 className="text-2xl font-bold text-gray-900 mb-2">
+						<h2 className="font-cardo text-3xl font-bold text-text-primary mb-3">
 							{venue.name}
 						</h2>
-						<div className="flex items-center gap-3 mb-2">
-							<span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+						<div className="flex items-center gap-3 mb-3">
+							<span className="px-3 py-1 bg-primary text-white rounded-full text-sm font-medium font-sans">
 								{venue.venue_type}
 							</span>
-							<span className="text-gray-500">•</span>
-							<span className="text-gray-600">{venue.neighborhood}</span>
+							<span className="text-text-muted">•</span>
+							<span className="text-text-secondary font-sans">
+								{venue.neighborhood}
+							</span>
 						</div>
-						<p className="text-gray-700">{venue.address}</p>
+						<p className="text-text-secondary font-sans">{venue.address}</p>
 					</div>
 					<button
 						onClick={onClose}
-						className="text-gray-400 hover:text-gray-600 text-2xl font-bold ml-4"
+						className="text-text-muted hover:text-text-primary text-3xl font-bold ml-4 transition-colors"
 					>
 						×
 					</button>
@@ -101,134 +103,156 @@ export default function VenueModal({
 								neighborhood={venue.neighborhood}
 								cachedPhotoRef={venue.gmaps_primary_photo_ref}
 							/>
-							<PhotoAttribution
-								html={
-									venue.gmaps_photo_attribution ||
-									"Photo from Google Places API"
-								}
-							/>
 						</div>
 
-						{/* Quick Info */}
-						<div className="space-y-4">
-							{/* Ratings Section */}
-							{(venue.google_maps_rating ||
-								venue.yelp_rating ||
-								venue.tripadvisor_rating) && (
-								<div>
-									<h3 className="text-lg font-semibold text-gray-900 mb-3">
-										Ratings
-									</h3>
-									<div className="space-y-2">
-										{renderRating(venue.google_maps_rating, "Google Maps")}
-										{renderRating(venue.yelp_rating, "Yelp")}
-										{renderRating(venue.tripadvisor_rating, "TripAdvisor")}
-									</div>
-								</div>
-							)}
+						{/* Photo Attribution */}
+						{venue.gmaps_photo_attribution && (
+							<div className="mb-6">
+								<PhotoAttribution html={venue.gmaps_photo_attribution} />
+							</div>
+						)}
 
-							{/* Links Section */}
-							{(venue.google_maps_url ||
-								venue.yelp_url ||
-								venue.tripadvisor_url) && (
-								<div>
-									<h3 className="text-lg font-semibold text-gray-900 mb-3">
-										Links
-									</h3>
-									<div className="space-y-2">
-										{venue.google_maps_url && (
-											<a
-												href={venue.google_maps_url}
-												target="_blank"
-												rel="noopener noreferrer"
-												className="flex items-center gap-2 px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
-											>
-												📍 Google Maps
-											</a>
-										)}
-										{venue.yelp_url && (
-											<a
-												href={venue.yelp_url}
-												target="_blank"
-												rel="noopener noreferrer"
-												className="flex items-center gap-2 px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
-											>
-												⭐ Yelp
-											</a>
-										)}
-										{venue.tripadvisor_url && (
-											<a
-												href={venue.tripadvisor_url}
-												target="_blank"
-												rel="noopener noreferrer"
-												className="flex items-center gap-2 px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
-											>
-												🌍 TripAdvisor
-											</a>
-										)}
-									</div>
-								</div>
+						{/* Ratings */}
+						<div className="mb-6">
+							<h3 className="font-cardo text-lg font-bold text-text-primary mb-3">
+								Ratings
+							</h3>
+							<div className="space-y-2">
+								{renderRating(venue.yelp_rating, "Yelp")}
+								{renderRating(venue.google_maps_rating, "Google Maps")}
+								{renderRating(venue.tripadvisor_rating, "TripAdvisor")}
+							</div>
+						</div>
+
+						{/* Links */}
+						<div className="space-y-2">
+							{venue.google_maps_url && (
+								<a
+									href={venue.google_maps_url}
+									target="_blank"
+									rel="noopener noreferrer"
+									className="block w-full px-4 py-2 bg-primary text-white text-center rounded-lg hover:bg-primary-dark transition-colors font-sans"
+								>
+									📍 View on Google Maps
+								</a>
+							)}
+							{venue.yelp_url && (
+								<a
+									href={venue.yelp_url}
+									target="_blank"
+									rel="noopener noreferrer"
+									className="block w-full px-4 py-2 bg-accent-celadon text-text-primary text-center rounded-lg hover:bg-accent-celadon/80 transition-colors font-sans"
+								>
+									🍽️ View on Yelp
+								</a>
+							)}
+							{venue.tripadvisor_url && (
+								<a
+									href={venue.tripadvisor_url}
+									target="_blank"
+									rel="noopener noreferrer"
+									className="block w-full px-4 py-2 bg-accent-tiffany text-white text-center rounded-lg hover:bg-accent-tiffany/80 transition-colors font-sans"
+								>
+									🌍 View on TripAdvisor
+								</a>
 							)}
 						</div>
 					</div>
 
-					{/* Right Side - Main Content */}
+					{/* Right Side - Descriptions and Details */}
 					<div className="lg:w-2/3 p-6">
-						<div className="space-y-6">
-							{/* Description Section */}
-							{(venue.blog_description || venue.general_description) && (
-								<div>
-									<h3 className="text-lg font-semibold text-gray-900 mb-3">
-										Description
-									</h3>
-									<div className="space-y-3">
-										{venue.blog_description && (
-											<div>
-												<h4 className="font-medium text-gray-800 mb-2">
-													Blog Description
-												</h4>
-												<p className="text-gray-700 leading-relaxed">
-													{venue.blog_description}
-												</p>
-											</div>
-										)}
-										{venue.general_description && (
-											<div>
-												<h4 className="font-medium text-gray-800 mb-2">
-													General Description
-												</h4>
-												<p className="text-gray-700 leading-relaxed">
-													{venue.general_description}
-												</p>
-											</div>
-										)}
-									</div>
-								</div>
-							)}
-
-							{/* Keywords Section */}
-							{keywords.length > 0 && (
-								<div>
-									<h3 className="text-lg font-semibold text-gray-900 mb-3">
-										Keywords & Tags
-									</h3>
-									<div className="flex flex-wrap gap-2">
-										{keywords.map((keyword, index) => (
-											<span
-												key={index}
-												className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm"
-											>
-												{keyword}
-											</span>
-										))}
-									</div>
-								</div>
-							)}
-
-							{/* Additional Info */}
-							<div className="text-sm text-gray-500 pt-4 border-t border-gray-200">
-								<p>Last updated: {venue.processed_at}</p>
+						{/* Blog Description */}
+						{venue.blog_description && (
+							<div className="mb-6">
+								<h3 className="font-cardo text-xl font-bold text-text-primary mb-3">
+									About This Venue
+								</h3>
+								<p className="text-text-secondary font-sans leading-relaxed">
+									{venue.blog_description}
+								</p>
 							</div>
+						)}
+
+						{/* General Description */}
+						{venue.general_description && (
+							<div className="mb-6">
+								<h3 className="font-cardo text-xl font-bold text-text-primary mb-3">
+									Description
+								</h3>
+								<p className="text-text-secondary font-sans leading-relaxed">
+									{venue.general_description}
+								</p>
+							</div>
+						)}
+
+						{/* Keywords & Tags */}
+						{keywords.length > 0 && (
+							<div className="mb-6">
+								<h3 className="font-cardo text-xl font-bold text-text-primary mb-3">
+									Keywords & Tags
+								</h3>
+								<div className="flex flex-wrap gap-2">
+									{keywords.map((keyword, index) => (
+										<span
+											key={index}
+											className="px-3 py-2 bg-accent-nonphoto text-text-primary rounded-lg font-sans"
+										>
+											{keyword}
+										</span>
+									))}
+								</div>
+							</div>
+						)}
+
+						{/* Additional Info */}
+						<div className="space-y-3">
+							<h3 className="font-cardo text-xl font-bold text-text-primary mb-3">
+								Additional Information
+							</h3>
+
+							{venue.yelp_reviews_count && (
+								<div className="flex justify-between items-center py-2 border-b border-gray-100">
+									<span className="font-sans text-text-secondary">
+										Yelp Reviews
+									</span>
+									<span className="font-sans font-medium text-text-primary">
+										{venue.yelp_reviews_count.toLocaleString()}
+									</span>
+								</div>
+							)}
+
+							{venue.google_maps_reviews_count && (
+								<div className="flex justify-between items-center py-2 border-b border-gray-100">
+									<span className="font-sans text-text-secondary">
+										Google Reviews
+									</span>
+									<span className="font-sans font-medium text-text-primary">
+										{venue.google_maps_reviews_count.toLocaleString()}
+									</span>
+								</div>
+							)}
+
+							{venue.tripadvisor_reviews_count && (
+								<div className="flex justify-between items-center py-2 border-b border-gray-100">
+									<span className="font-sans text-text-secondary">
+										TripAdvisor Reviews
+									</span>
+									<span className="font-sans font-medium text-text-primary">
+										{venue.tripadvisor_reviews_count.toLocaleString()}
+									</span>
+								</div>
+							)}
+
+							{venue.processed_at && (
+								<div className="flex justify-between items-center py-2">
+									<span className="font-sans text-text-secondary">
+										Last Updated
+									</span>
+									<span className="font-sans font-medium text-text-primary">
+										{new Date(venue.processed_at).toLocaleDateString()}
+									</span>
+								</div>
+							)}
 						</div>
 					</div>
 				</div>
