@@ -30,8 +30,13 @@ export const metadata: Metadata = {
 		"dining",
 		"map",
 	],
-	authors: [{ name: "Doug", url: "https://doug.is" }],
-	creator: "Doug",
+	authors: [
+		{
+			name: "Douglas Rogers",
+			url: "https://www.linkedin.com/in/douglasrogers/",
+		},
+	],
+	creator: "Douglas Rogers",
 	publisher: "Goose Chase",
 	formatDetection: {
 		email: false,
@@ -52,7 +57,7 @@ export const metadata: Metadata = {
 			"Explore 122 Chicago venues from @DanteTheDon's Barstool Sports article on Chicago bachelor party destinations. Interactive map with photos, ratings, and details.",
 		images: [
 			{
-				url: "/goosechase-modal-screenshot.png",
+				url: "https://goose-chase-simple.vercel.app/goosechase-screenshot-modal.png",
 				width: 1200,
 				height: 630,
 				alt: "Goose Chase - Chicago Venues Modal with Photo and Details",
@@ -61,12 +66,14 @@ export const metadata: Metadata = {
 	},
 	twitter: {
 		card: "summary_large_image",
-		site: "@afxjzs",
-		creator: "@afxjzs",
+		site: "@Branch",
+		creator: "@Branch",
 		title: "Goose Chase | Chicago Venues",
 		description:
 			"Explore 122 Chicago venues from @DanteTheDon's Barstool Sports article on Chicago bachelor party destinations. Interactive map with photos, ratings, and details.",
-		images: ["/goosechase-modal-screenshot.png"],
+		images: [
+			"https://goose-chase-simple.vercel.app/goosechase-screenshot-modal.png",
+		],
 	},
 	robots: {
 		index: true,
